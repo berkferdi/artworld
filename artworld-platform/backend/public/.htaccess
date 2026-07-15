@@ -1,0 +1,17 @@
+# Apache config for public web root
+# DocumentRoot should typically point to this /public directory
+# Admin panel is at ../admin — alias /admin to that path in Nginx/Apache
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve uploaded media from ../uploads via /uploads/...
+    RewriteRule ^uploads/(.*)$ ../uploads/$1 [L]
+
+    # API front controller
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ api/index.php [QSA,L]
+</IfModule>
