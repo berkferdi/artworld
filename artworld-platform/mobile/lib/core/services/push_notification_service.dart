@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +23,12 @@ class PushNotificationService {
   Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
+
+    // FCM is mobile-oriented; skip on web/desktop without crashing.
+    if (kIsWeb) {
+      debugPrint('FCM: web platformunda atlanıyor.');
+      return;
+    }
 
     try {
       await Firebase.initializeApp();
@@ -65,7 +69,11 @@ class PushNotificationService {
       }
 
       final info = await PackageInfo.fromPlatform();
-      final platform = Platform.isIOS ? 'ios' : 'android';
+      final platform = switch (defaultTargetPlatform) {
+        TargetPlatform.iOS => 'ios',
+        TargetPlatform.android => 'android',
+        _ => 'android',
+      };
 
       await _api.post(
         '/devices/register',

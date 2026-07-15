@@ -15,11 +15,13 @@ class NewsRepository {
 
   Future<List<NewsItem>> list({
     String? category,
+    String? search,
     bool? breaking,
     int page = 1,
   }) async {
     final query = <String, dynamic>{'page': page};
     if (category != null && category.isNotEmpty) query['category'] = category;
+    if (search != null && search.isNotEmpty) query['search'] = search;
     if (breaking == true) query['breaking'] = 1;
 
     final response = await _api.get('/news', queryParameters: query);

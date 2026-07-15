@@ -8,16 +8,9 @@
 [x] Diğer REST API endpointleri oluşturuldu
 [x] Admin login oluşturuldu
 [x] Admin layout ve dashboard oluşturuldu
-[x] Kategori CRUD oluşturuldu
-[x] Haber CRUD oluşturuldu
-[x] Son dakika CRUD oluşturuldu
-[x] Banner CRUD oluşturuldu
-[x] Video CRUD oluşturuldu
-[x] Program CRUD oluşturuldu
-[x] Bölüm CRUD oluşturuldu
-[x] Canlı yayın CRUD oluşturuldu
-[x] App settings oluşturuldu
-[x] Notifications / FCM altyapısı oluşturuldu
+[x] Kategori / Haber / Son dakika / Banner CRUD
+[x] Video / Program / Bölüm / Canlı yayın CRUD
+[x] App settings / Notifications / FCM altyapısı
 [x] Flutter proje kurulumu
 [x] Flutter tema / router / Dio / Riverpod
 [x] Splash / Home / Drawer / Bottom nav
@@ -25,54 +18,50 @@
 [x] Videos / Video player / HLS / MP4
 [x] Programs / Episodes / Live stream
 [x] Cache / Error / Empty / Loading states
-[x] Dokümantasyon tamamlandı (README, API, INSTALLATION, DEPLOYMENT)
-[x] PHP syntax kontrolü geçti (53 dosya, 0 hata)
-[x] Home API yerel test başarılı (200)
+[x] Dokümantasyon tamamlandı
+[x] PHP syntax kontrolü geçti
+[x] Backend HTTP testleri geçti
 [x] Flutter analyze: No issues found
+[x] Flutter gerçek runtime test oturumu (2026-07-15)
 
-## Canlı Backend Test Oturumu (2026-07-15)
+## Flutter Runtime Test Oturumu (2026-07-15)
 
-Ortam:
-- PHP 8.3.6 CLI
-- MariaDB 10.11 (mysqld çalışıyor, socket `/run/mysqld/mysqld.sock`)
-- `.env` mevcut (`APP_URL=http://127.0.0.1:8080`)
-- PDO bağlantısı: OK
-- API sunucu: `php -S 127.0.0.1:8080 router.php` (backend/public)
-- Admin sunucu: `php -S 127.0.0.1:8081` (backend/admin)
+### Ortam
+- Flutter 3.32.5 / Dart 3.8.1
+- Cihazlar: Linux (desktop deps eksik), Chrome (web), Android SDK kuruldu
+- Android emulator yok (AVD yok)
+- API: `http://127.0.0.1:8080/api/v1` ayakta
 
-### HTTP API sonuçları
+### Komut sonuçları
+- `flutter pub get` → Got dependencies
+- `flutter analyze` → No issues found
+- `flutter test` → All tests passed (widget + API integration + UI states)
+- `flutter build apk --debug` → **SUCCESS** → `build/app/outputs/flutter-apk/app-debug.apk` (~101MB)
+- `flutter run -d chrome --headless` → uygulama ayağa kalktı; splash → GET `/settings/public` + GET `/home` **HTTP 200** gerçek veri
 
-| Endpoint | HTTP | success |
-|----------|------|---------|
-| GET /api/v1/home | 200 | true |
-| GET /api/v1/news | 200 | true |
-| GET /api/v1/videos | 200 | true |
-| GET /api/v1/programs | 200 | true |
-| GET /api/v1/live | 200 | true |
-| GET /api/v1/news/6 | 200 | true |
-| GET /api/v1/videos/canli-test-videosu | 200 | true |
-| GET /api/v1/programs/canli-test-programi | 200 | true |
-| GET /api/v1/episodes/canli-test-bolumu-1 | 200 | true |
+### Düzeltmeler
+1. `AppConfig`: `String.fromEnvironment` ile `API_BASE_URL` / `MEDIA_BASE_URL`; Android emulator sabitleri `10.0.2.2`
+2. FCM: `dart:io` kaldırıldı; web'de sessizce atlanıyor (`kIsWeb`)
+3. Dio: global `Content-Type: application/json` GET isteklerinden kaldırıldı (POST'ta ayrıca set)
+4. News/Videos repository: `search` query parametresi eklendi
+5. `ndkVersion = "27.0.12077973"` Android build warning için
+6. Gerçek API integration testleri eklendi (`test/api_integration_test.dart`) — `TestWidgetsFlutterBinding` HTTP mock tuzağı belgelendi/kaçınıldı
+7. Web platformu eklendi (`flutter create --platforms=web`)
 
-### Admin panel
+### Kanıtlanan veri akışları (gerçek API)
+- Home payload: featured/latest news, videos, programs, live stream
+- Admin test haberi `Canlı Test Haberi 122254` API + Chrome runtime home'da
+- Admin test videosu MP4 URL
+- HLS seed videosu `.m3u8`
+- Program `canli-test-programi` + bölüm
+- Live stream URL API'den
+- Search `sanat` sonuç döndü
+- Türkçe `ApiException` 404 endpoint için
 
-| Kontrol | Sonuç |
-|---------|--------|
-| GET /login.php | HTTP 200, form + CSRF token |
-| GET /index.php (oturumsuz) | HTTP 302 → login |
-| POST login (doğru şifre) | HTTP 302 → dashboard HTTP 200 |
-| POST login (yanlış şifre) | HTTP 200, "E-posta veya şifre hatalı" |
-| POST news create | 302, DB id=6 published |
-| POST video create | 302, DB id=4 published |
-| POST program create | 302, DB id=3 active |
-| POST episode create | 302, DB id=4 published |
+### Sınırlamalar
+- Android emulator yok → native MP4/HLS/fullscreen player görsel olarak oynatılamadı (URL ve player kod yolu doğrulandı; APK üretildi)
+- Chrome headless'ta WebGL yok → video görsel render sınırlı; API/home boot doğrulandı
+- Ekran tıklama navigasyonu (drawer/bottom nav) headless ortamda UI otomasyonu yapılmadı; routing ve data layer test edildi
 
-Oluşturulan kayıtlar `/api/v1/home` içinde de göründü (featured news, latest videos, programs).
-
-### Notlar
-- Kod düzeltmesi gerekmedi; runtime hataları çıkmadı.
-- `.env` ve production secret’lar commit edilmedi.
-- Flutter bu oturumda çalıştırılmadı (talep gereği).
-
-## Durum
-Backend + DB + API + Admin canlı testleri geçti.
+## Sonraki adım (opsiyonel)
+Fiziksel cihaz veya AVD üzerinde APK kurup MP4/HLS/canlı yayın player'ı görsel smoke test.

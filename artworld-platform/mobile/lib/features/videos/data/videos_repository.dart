@@ -13,8 +13,13 @@ class VideosRepository {
 
   final ApiClient _api;
 
-  Future<List<VideoItem>> list({int page = 1}) async {
-    final response = await _api.get('/videos', queryParameters: {'page': page});
+  Future<List<VideoItem>> list({
+    int page = 1,
+    String? search,
+  }) async {
+    final query = <String, dynamic>{'page': page};
+    if (search != null && search.isNotEmpty) query['search'] = search;
+    final response = await _api.get('/videos', queryParameters: query);
     final data = response['data'];
     if (data is! List) return const [];
     return data

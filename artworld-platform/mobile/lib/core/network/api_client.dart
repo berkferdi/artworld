@@ -22,9 +22,10 @@ class ApiClient {
         connectTimeout: AppConfig.connectTimeout,
         receiveTimeout: AppConfig.receiveTimeout,
         sendTimeout: AppConfig.sendTimeout,
+        // Do not set Content-Type globally: PHP built-in server can reject GET
+        // requests that advertise application/json with HTTP 400 empty body.
         headers: const {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
         },
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -87,7 +88,14 @@ class ApiClient {
     Map<String, dynamic>? data,
   }) async {
     try {
-      final response = await _dio.post<dynamic>(path, data: data);
+      final response = await _dio.post<dynamic>(
+        path,
+        data: data,
+        options: Options(
+          contentType: Headers.jsonContentType,
+          headers: const {'Accept': 'application/json'},
+        ),
+      );
       return _unwrap(response);
     } on DioException catch (e) {
       throw _mapDio(e);
