@@ -91,6 +91,9 @@ $appName = (string) (\App\Core\Config::get('APP_NAME', 'Art World Mobile'));
             <a class="nav-link <?= active_menu('settings.php') ?>" href="<?= e(admin_url('settings.php')) ?>">
                 <i class="bi bi-gear"></i> Ayarlar
             </a>
+            <a class="nav-link <?= active_menu('file_server.php') ?>" href="<?= e(admin_url('file_server.php')) ?>">
+                <i class="bi bi-hdd-network"></i> File Server
+            </a>
             <?php if (\App\Core\Auth::isSuperAdmin()): ?>
             <a class="nav-link <?= active_menu('admins.php') ?>" href="<?= e(admin_url('admins.php')) ?>">
                 <i class="bi bi-people"></i> Yöneticiler

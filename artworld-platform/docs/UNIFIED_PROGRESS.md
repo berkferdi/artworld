@@ -1,18 +1,21 @@
 # Art World Unified Platform — Progress
 
-## Live-first homepage + video source system (2026-09-25)
+## Final unified iteration (2026-09-25)
 
-[x] Homepage: CANLI ART WORLD TV full-width top player (no sidebar duplicate)
-[x] Live uses GET /api/v1/live (same as mobile)
-[x] Autoplay muted + Sesi Aç overlay; HLS.js
-[x] Ticker moved below live on homepage
-[x] Video source_type migration 003 + FileServerService (local/sftp/http)
-[x] Admin video CRUD: File Server / YouTube / External + source filter + delete file
-[x] API: source_type + playback_url (video_url kept)
-[x] Web video detail: HTML5 / HLS / YouTube embed by source
-[x] Flutter SmartVideoPlayer (file_server via Chewie, youtube via launcher)
-[x] File server probe documented (193.35.155.55 unreachable HTTP; use MEDIA_URL local mode)
-[x] Mobile API regression: home/news/videos/programs/live → 200
+### COMPLETED (code)
+[x] Live-first web homepage (no sidebar duplicate)
+[x] Dual video sources + migration 003 + SmartVideoPlayer
+[x] Admin File Server settings UI + connection test
+[x] Encrypted secrets (SecretBox / APP_KEY)
+[x] Dashboard File Server online/offline card
+[x] Unified Nginx docs for artworldapi.com.tr
+[x] ARCHITECTURE.md + VIDEO_SYSTEM.md + updated FILE_SERVER / PRODUCTION
+[x] Env examples retargeted to artworldapi.com.tr
 
-## Prior phases 0–18
-See previous UNIFIED_PROGRESS entries; web SSR + admin web modules remain in place.
+### INFRASTRUCTURE
+[ ] Nginx cutover on production host (artworldapi.com.tr currently API-only → JSON 404 on `/`)
+[ ] File Server 193.35.155.55 online + SFTP + media.artworldapi.com.tr HTTPS
+[ ] Apply migrations 002/003 on production DB if not applied
+
+### API REGRESSION (api.artworldapi.com.tr)
+[x] home/news/videos/programs/live → HTTP 200

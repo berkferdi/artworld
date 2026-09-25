@@ -1,50 +1,44 @@
 # File Server / Video Storage
 
-## Discovery (2026-09-25)
+## Status (2026-09-25)
 
-| Host | Port | Result |
-|------|------|--------|
-| `193.35.155.55` | 80 | TCP connect OK, **no HTTP response** (timeout) |
-| `193.35.155.55` | 443 | TCP connect OK, **TLS handshake timeout** |
-| `193.35.155.55` | 22 | **Not reachable** from cloud agent |
-| `193.35.155.149` / `api.artworldapi.com.tr` | 80/443 | **OK** — Nginx, `Accept-Ranges: bytes` on media |
+| Check | Result |
+|-------|--------|
+| Code: FileServerService + Admin UI + encrypted secrets | **PASS** |
+| Infrastructure: `193.35.155.55` HTTP/SFTP from cloud agent | **PENDING / BLOCKED** (TCP 80/443 hang, SSH timeout) |
+| Local fallback (`FILE_SERVER_MODE=local` / Admin mode=local) | **PASS** |
+| YouTube alternative source | **PASS** |
 
-Conclusion: direct File Server IP is not usable from this environment yet. Public media currently serves via API host (`MEDIA_URL`).
+## Admin
 
-## Config (`.env`)
+**Sistem → File Server** (`backend/admin/file_server.php`)
 
-```env
-FILE_SERVER_ENABLED=true
-FILE_SERVER_MODE=local          # local | sftp | http
-FILE_SERVER_HOST=193.35.155.55
-FILE_SERVER_PORT=22
-FILE_SERVER_USER=
-FILE_SERVER_PASSWORD=
-FILE_SERVER_SSH_KEY=
-FILE_SERVER_BASE_PATH=/var/www/artworld
-FILE_SERVER_PUBLIC_BASE_URL=    # e.g. https://media.artworld.com.tr
-FILE_SERVER_UPLOAD_URL=
-FILE_SERVER_UPLOAD_TOKEN=
+- Enabled / Mode / Host / Port / User / Password (masked) / SSH key / Upload path / Public Media URL
+- **Bağlantıyı Test Et** → TCP + SFTP auth/path or HTTP probe
+- Dashboard card shows Online / Offline
+- Secrets stored in `app_settings` via `SecretBox` (`APP_KEY`)
+
+## Config resolution
+
+1. Admin DB settings (`FileServerConfigService`)
+2. Fallback `.env` `FILE_SERVER_*`
+
+## Modes
+
+| Mode | Behavior |
+|------|----------|
+| `local` | `backend/uploads/videos` + `MEDIA_URL` / Public Media URL |
+| `sftp` | php-ssh2 upload; fallback to local on failure |
+| `http` | multipart POST to upload URL; fallback to local |
+
+## Public media target
+
+```text
+https://media.artworldapi.com.tr/
 ```
 
-- **local** (default): `UploadService` → `backend/uploads/videos/...`, playback via `MEDIA_URL`
-- **sftp**: requires `php-ssh2` + credentials; on failure keeps local copy
-- **http**: multipart POST to upload endpoint; on failure keeps local copy
+See `docs/nginx/artworldapi.com.tr.conf.md` for reverse-proxy example to `193.35.155.55`.
 
-## API fields (backward compatible)
+## Logging
 
-Existing: `video_url`, `video_type`
-
-Added: `source_type` (`file_server`|`youtube`|`external`), `playback_url` (public URL; same as resolved `video_url`)
-
-`file_path` is stored in DB for admin/delete — **not** exposed on public list API.
-
-## Migration
-
-```bash
-mysql ... < database/migrations/003_video_source_types.sql
-```
-
-## Range / seek
-
-API media host already returns `Accept-Ranges: bytes`. Prefer HTTPS public URL (not bare HTTP IP) to avoid mixed-content on `https://www.artworld.com.tr`.
+`backend/uploads/file-server.log` — UPLOAD_* / FILE_SERVER_CONNECTION_FAILED (no secrets).

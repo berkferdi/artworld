@@ -11,7 +11,7 @@ final class SeoController extends BaseController
     public function robots(): void
     {
         header('Content-Type: text/plain; charset=utf-8');
-        $host = rtrim((string) Config::get('CANONICAL_HOST', 'https://www.artworld.com.tr'), '/');
+        $host = rtrim((string) Config::get('CANONICAL_HOST', 'https://artworldapi.com.tr'), '/');
         echo "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: {$host}/sitemap.xml\nSitemap: {$host}/sitemap-news.xml\n";
     }
 
