@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Core\Database;
 use App\Core\Media;
+use App\Services\FileServerService;
 use PDO;
 
 final class ProgramModel
@@ -141,6 +142,13 @@ final class ProgramModel
 
     private function mapEpisode(array $row, bool $detail = false): array
     {
+        $playback = Media::url($row['video_url']);
+        $sourceType = FileServerService::resolveSourceType(
+            $row['source_type'] ?? null,
+            $row['video_type'] ?? null,
+            is_string($row['video_url'] ?? null) ? (string) $row['video_url'] : null
+        );
+
         return [
             'id' => (int) $row['id'],
             'program_id' => (int) $row['program_id'],
@@ -148,8 +156,10 @@ final class ProgramModel
             'slug' => $row['slug'],
             'description' => $detail ? ($row['description'] ?? '') : mb_substr((string) ($row['description'] ?? ''), 0, 160),
             'thumbnail' => Media::url($row['thumbnail'] ?? null),
-            'video_url' => Media::url($row['video_url']),
+            'video_url' => $playback,
+            'playback_url' => $playback,
             'video_type' => $row['video_type'],
+            'source_type' => $sourceType,
             'episode_number' => $row['episode_number'] !== null ? (int) $row['episode_number'] : null,
             'duration_seconds' => $row['duration_seconds'] !== null ? (int) $row['duration_seconds'] : null,
             'published_at' => $row['published_at'],

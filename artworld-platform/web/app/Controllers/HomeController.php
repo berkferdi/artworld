@@ -35,8 +35,18 @@ final class HomeController extends BaseController
         $banners = is_array($home['banners'] ?? null) ? $home['banners'] : [];
         $settings = is_array($home['settings'] ?? null) ? $home['settings'] : $this->settings();
 
+        // Prefer dedicated live endpoint so admin live URL drives web + mobile identically.
+        $liveFromApi = $this->api->data('/live', [], null);
+        if (is_array($liveFromApi) && !empty($liveFromApi['stream_url'])) {
+            $live = $liveFromApi;
+        }
+
+        $galleries = $this->api->data('/galleries', ['per_page' => 4], []);
+        $authors = $this->api->data('/authors', [], []);
+        $interviews = $this->api->data('/interviews', ['per_page' => 5], []);
+
         $this->render('pages/home', [
-            'title' => ($settings['app_name'] ?? 'Art World') . ' — Haber & Canlı Yayın',
+            'title' => ($settings['app_name'] ?? 'Art World') . ' — Canlı Yayın & Haber',
             'settings' => $settings,
             'breaking' => is_array($breaking) ? $breaking : [],
             'hero' => $hero,
@@ -48,6 +58,9 @@ final class HomeController extends BaseController
             'mostRead' => $mostRead,
             'selected' => $selected,
             'banners' => $banners,
+            'galleries' => is_array($galleries) ? $galleries : [],
+            'authors' => is_array($authors) ? $authors : [],
+            'interviews' => is_array($interviews) ? $interviews : [],
             'bodyClass' => 'page-home',
         ]);
     }

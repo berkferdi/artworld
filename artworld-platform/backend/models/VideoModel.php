@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Core\Database;
 use App\Core\Media;
+use App\Services\FileServerService;
 use PDO;
 
 final class VideoModel
@@ -128,14 +129,23 @@ final class VideoModel
 
     private function mapItem(array $row, bool $detail = false): array
     {
+        $playback = Media::url($row['video_url']);
+        $sourceType = FileServerService::resolveSourceType(
+            $row['source_type'] ?? null,
+            $row['video_type'] ?? null,
+            is_string($row['video_url'] ?? null) ? (string) $row['video_url'] : null
+        );
+
         $item = [
             'id' => (int) $row['id'],
             'title' => $row['title'],
             'slug' => $row['slug'],
             'description' => $detail ? ($row['description'] ?? '') : mb_substr((string) ($row['description'] ?? ''), 0, 160),
             'thumbnail' => Media::url($row['thumbnail'] ?? null),
-            'video_url' => Media::url($row['video_url']),
+            'video_url' => $playback,
+            'playback_url' => $playback,
             'video_type' => $row['video_type'],
+            'source_type' => $sourceType,
             'duration_seconds' => $row['duration_seconds'] !== null ? (int) $row['duration_seconds'] : null,
             'is_featured' => (bool) $row['is_featured'],
             'published_at' => $row['published_at'],
@@ -146,6 +156,12 @@ final class VideoModel
         ];
         if ($detail) {
             $item['category_id'] = $row['category_id'] !== null ? (int) $row['category_id'] : null;
+            if (isset($row['mime_type'])) {
+                $item['mime_type'] = $row['mime_type'];
+            }
+            if (isset($row['file_size']) && $row['file_size'] !== null) {
+                $item['file_size'] = (int) $row['file_size'];
+            }
         }
         return $item;
     }

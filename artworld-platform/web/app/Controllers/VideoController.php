@@ -34,16 +34,30 @@ final class VideoController extends BaseController
             return;
         }
 
+        $sourceType = (string) ($video['source_type'] ?? '');
+        $playback = (string) ($video['playback_url'] ?? $video['video_url'] ?? '');
         $embed = null;
-        if (($video['video_type'] ?? '') === 'youtube') {
-            $embed = youtube_embed_url((string) ($video['video_url'] ?? ''));
+        if ($sourceType === 'youtube' || ($video['video_type'] ?? '') === 'youtube') {
+            $embed = youtube_embed_url($playback);
         }
+
+        $jsonLd = [
+            '@context' => 'https://schema.org',
+            '@type' => 'VideoObject',
+            'name' => $video['title'] ?? '',
+            'description' => $video['description'] ?? '',
+            'thumbnailUrl' => $video['thumbnail'] ?? null,
+            'uploadDate' => $video['published_at'] ?? null,
+            'contentUrl' => $sourceType === 'youtube' ? null : $playback,
+            'embedUrl' => $embed,
+        ];
 
         $this->render('pages/video-show', [
             'title' => ($video['title'] ?? 'Video') . ' | Art World',
             'metaDescription' => truncate((string) ($video['description'] ?? ''), 160),
             'ogImage' => (string) ($video['thumbnail'] ?? ''),
             'canonical' => absolute_url(video_url((string) $video['slug'])),
+            'jsonLd' => $jsonLd,
             'video' => $video,
             'embed' => $embed,
             'related' => is_array($video['related'] ?? null) ? $video['related'] : [],

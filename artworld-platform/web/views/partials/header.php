@@ -6,7 +6,10 @@
 /** @var string $siteTagline */
 /** @var string $logo */
 $liveEnabled = !empty($settings['live_stream_enabled']);
+$bodyClass = $bodyClass ?? '';
+$isHome = str_contains((string) $bodyClass, 'page-home');
 ?>
+<?php if (!$isHome): ?>
 <div class="ticker" data-ticker>
     <div class="ticker__label">PİYASA</div>
     <div class="ticker__track">
@@ -18,6 +21,7 @@ $liveEnabled = !empty($settings['live_stream_enabled']);
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <header class="site-header">
     <div class="shell header-bar">

@@ -8,7 +8,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../core/widgets/app_video_player.dart';
+import '../../../core/widgets/smart_video_player.dart';
 import '../../../core/widgets/content_cards.dart';
 import '../../../core/widgets/empty_view.dart';
 import '../../../core/widgets/error_view.dart';
@@ -91,12 +91,14 @@ class VideoDetailScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(videoDetailProvider(idOrSlug)),
         ),
         data: (video) {
-          final url = ApiClient.resolveMediaUrl(video.videoUrl);
+          final url = ApiClient.resolveMediaUrl(video.resolvedPlaybackUrl);
           return ListView(
             children: [
               if (url.isNotEmpty)
-                AppVideoPlayer(
+                SmartVideoPlayer(
                   url: url,
+                  sourceType: video.sourceType,
+                  videoType: video.videoType,
                   posterUrl: video.thumbnail,
                   title: video.title,
                 )

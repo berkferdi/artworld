@@ -7,7 +7,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../core/widgets/app_video_player.dart';
+import '../../../core/widgets/smart_video_player.dart';
 import '../../../core/widgets/content_cards.dart';
 import '../../../core/widgets/empty_view.dart';
 import '../../../core/widgets/error_view.dart';
@@ -182,11 +182,17 @@ class EpisodePlayerScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(episodeDetailProvider(idOrSlug)),
         ),
         data: (episode) {
-          final url = ApiClient.resolveMediaUrl(episode.videoUrl);
+          final url = ApiClient.resolveMediaUrl(episode.resolvedPlaybackUrl);
           return ListView(
             children: [
               if (url.isNotEmpty)
-                AppVideoPlayer(url: url, title: episode.title)
+                SmartVideoPlayer(
+                  url: url,
+                  sourceType: episode.sourceType,
+                  videoType: episode.videoType,
+                  posterUrl: episode.thumbnail,
+                  title: episode.title,
+                )
               else
                 const ErrorView(message: 'Video adresi bulunamadı.'),
               Padding(

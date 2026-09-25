@@ -41,7 +41,7 @@ $bodyClass = $bodyClass ?? '';
     <?php endif; ?>
 </head>
 <body class="<?= e($bodyClass) ?>">
-    <?php \Web\Core\View::partial('partials/header', compact('settings', 'categories', 'menuItems', 'siteName', 'siteTagline', 'logo')); ?>
+    <?php \Web\Core\View::partial('partials/header', compact('settings', 'categories', 'menuItems', 'siteName', 'siteTagline', 'logo', 'bodyClass')); ?>
     <main id="main" class="site-main">
         <?= $content ?>
     </main>
