@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Art World">
+  <rect width="160" height="160" fill="#070b14"/>
+  <circle cx="80" cy="80" r="58" fill="none" stroke="#2fd3ff" stroke-width="6"/>
+  <path d="M42 104 L80 36 L118 104 Z" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="80" cy="88" r="10" fill="#2fd3ff"/>
+</svg>

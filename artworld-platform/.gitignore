@@ -1,7 +1,13 @@
 # Environment
 .env
 backend/.env
+web/.env
 **/.env
+
+# Web cache / logs
+web/storage/cache/*
+!web/storage/cache/.gitkeep
+web/storage/*.log
 
 # Uploads (keep structure)
 backend/uploads/images/**
@@ -33,3 +39,6 @@ mobile/*.iml
 
 # Logs
 *.log
+
+# Local backups (outside deployable tree)
+/backups/
