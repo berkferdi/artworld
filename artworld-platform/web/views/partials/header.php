@@ -53,11 +53,27 @@ $liveEnabled = !empty($settings['live_stream_enabled']);
             <?php foreach ($menuItems as $item): ?>
                 <a href="<?= e((string) ($item['url'] ?? '#')) ?>"><?= e((string) ($item['title'] ?? '')) ?></a>
             <?php endforeach; ?>
-            <?php if (!empty($categories)): ?>
-                <?php foreach (array_slice($categories, 0, 8) as $cat): ?>
-                    <a class="nav-cat" href="<?= e(category_url((string) $cat['slug'])) ?>"><?= e((string) $cat['name']) ?></a>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            <?php
+            $shown = [];
+            foreach ($menuItems as $mi) {
+                $shown[] = strtolower((string) ($mi['title'] ?? ''));
+            }
+            $navCats = 0;
+            foreach ($categories as $cat) {
+                $name = trim((string) ($cat['name'] ?? ''));
+                if ($name === '' || str_contains($name, '/') || mb_strlen($name) > 28) {
+                    continue;
+                }
+                if (in_array(strtolower($name), $shown, true)) {
+                    continue;
+                }
+                echo '<a class="nav-cat" href="' . e(category_url((string) $cat['slug'])) . '">' . e($name) . '</a>';
+                $navCats++;
+                if ($navCats >= 6) {
+                    break;
+                }
+            }
+            ?>
         </div>
     </nav>
 </header>
