@@ -2,11 +2,16 @@
 
 Ubuntu + Nginx + PHP-FPM + MySQL + Let’s Encrypt
 
-Örnek domainler:
+## Target domains (unified)
 
-- `https://admin.example.com` — Admin paneli
-- `https://api.example.com` — REST API
-- `https://media.example.com` — Medya / HLS
+- `https://artworldapi.com.tr/` — Web
+- `https://artworldapi.com.tr/login` — Admin
+- `https://artworldapi.com.tr/api/v1/` — REST API
+- `https://media.artworldapi.com.tr/` — Media / File Server (optional)
+
+Full Nginx example: `docs/nginx/artworldapi.com.tr.conf.md`
+
+Until cutover, existing split hosts (`api.artworldapi.com.tr`, `admin.artworldapi.com.tr`) may still serve API/Admin.
 
 ## 1. Sunucu paketleri
 
@@ -21,17 +26,17 @@ sudo apt install -y nginx mysql-server php8.3-fpm php8.3-mysql php8.3-gd \
 `/etc/php/8.3/fpm/php.ini`:
 
 ```ini
-upload_max_filesize = 256M
-post_max_size = 260M
-max_execution_time = 300
-max_input_time = 300
+upload_max_filesize = 1024M
+post_max_size = 1040M
+max_execution_time = 600
+max_input_time = 600
 memory_limit = 512M
 ```
 
 Nginx:
 
 ```nginx
-client_max_body_size 260M;
+client_max_body_size 1024M;
 ```
 
 ```bash
