@@ -164,7 +164,12 @@ if grep -v 'No syntax errors' /tmp/artworld-php-lint.txt | grep -q .; then
 fi
 echo "PHP_LINT_OK"
 
-echo "===== 8) Permissions ====="
+echo "===== 8) Permissions + public/assets symlink ====="
+# So nginx root=web/public can serve /assets/* without router.php
+if [[ -d "$REMOTE_PATH/web/assets" ]]; then
+  sudo ln -sfn ../assets "$REMOTE_PATH/web/public/assets"
+  echo "LINKED:web/public/assets -> ../assets"
+fi
 if id www-data >/dev/null 2>&1; then
   if id art >/dev/null 2>&1; then
     sudo chown -R art:www-data "$REMOTE_PATH/backend/uploads" || true
