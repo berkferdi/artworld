@@ -38,6 +38,10 @@ final class NewsModel
             $params[] = $term;
             $params[] = $term;
         }
+        if (!empty($filters['date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $filters['date'])) {
+            $where[] = 'DATE(n.published_at) = ?';
+            $params[] = $filters['date'];
+        }
 
         $sort = $filters['sort'] ?? 'latest';
         $orderBy = match ($sort) {
@@ -109,18 +113,58 @@ final class NewsModel
 
     public function featured(int $limit = 10): array
     {
-        $stmt = $this->pdo->prepare(
-            "SELECT n.id, n.title, n.slug, n.summary, n.cover_image, n.author, n.is_featured, n.is_breaking,
-                    n.published_at, c.name AS category_name, c.slug AS category_slug
-             FROM news n
-             LEFT JOIN categories c ON c.id = n.category_id
-             WHERE n.status = 'published' AND n.is_featured = 1
-             ORDER BY n.published_at DESC
-             LIMIT ?"
-        );
+        try {
+            $stmt = $this->pdo->prepare(
+                "SELECT n.id, n.title, n.slug, n.summary, n.cover_image, n.author, n.is_featured, n.is_breaking,
+                        n.manset_order, n.published_at, c.name AS category_name, c.slug AS category_slug
+                 FROM news n
+                 LEFT JOIN categories c ON c.id = n.category_id
+                 WHERE n.status = 'published' AND n.is_featured = 1
+                 ORDER BY COALESCE(n.manset_order, 9999) ASC, n.published_at DESC
+                 LIMIT ?"
+            );
+        } catch (Throwable) {
+            $stmt = $this->pdo->prepare(
+                "SELECT n.id, n.title, n.slug, n.summary, n.cover_image, n.author, n.is_featured, n.is_breaking,
+                        n.published_at, c.name AS category_name, c.slug AS category_slug
+                 FROM news n
+                 LEFT JOIN categories c ON c.id = n.category_id
+                 WHERE n.status = 'published' AND n.is_featured = 1
+                 ORDER BY n.published_at DESC
+                 LIMIT ?"
+            );
+        }
         $stmt->bindValue(1, $limit, PDO::PARAM_INT);
         $stmt->execute();
         return array_map([$this, 'mapListItem'], $stmt->fetchAll());
+    }
+
+    /** Numbered manşet strip: featured with order, then fill from latest. */
+    public function manset(int $limit = 16): array
+    {
+        $featured = $this->featured($limit);
+        if (count($featured) >= $limit) {
+            return $featured;
+        }
+        $ids = array_map(static fn(array $n): int => (int) $n['id'], $featured);
+        $need = $limit - count($featured);
+        $latest = $this->latest($limit + 10);
+        foreach ($latest as $item) {
+            if (in_array((int) $item['id'], $ids, true)) {
+                continue;
+            }
+            $featured[] = $item;
+            if (count($featured) >= $limit) {
+                break;
+            }
+        }
+        return $featured;
+    }
+
+    public function byCategorySlug(string $slug, int $limit = 6): array
+    {
+        $result = $this->list(['category' => $slug], 1, $limit);
+        return $result['items'];
     }
 
     public function latest(int $limit = 10): array
@@ -169,6 +213,7 @@ final class NewsModel
             'author' => $row['author'] ?? null,
             'is_featured' => (bool) ($row['is_featured'] ?? false),
             'is_breaking' => (bool) ($row['is_breaking'] ?? false),
+            'manset_order' => isset($row['manset_order']) && $row['manset_order'] !== null ? (int) $row['manset_order'] : null,
             'published_at' => $row['published_at'],
             'category' => [
                 'name' => $row['category_name'] ?? null,
@@ -183,6 +228,8 @@ final class NewsModel
         $item['content'] = $row['content'] ?? '';
         $item['category_id'] = $row['category_id'] !== null ? (int) $row['category_id'] : null;
         $item['status'] = $row['status'];
+        $item['source_url'] = $row['source_url'] ?? null;
+        $item['source_name'] = $row['source_name'] ?? null;
         return $item;
     }
 }

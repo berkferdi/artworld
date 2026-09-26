@@ -209,7 +209,9 @@ class VideoItem {
     this.description,
     this.thumbnail,
     this.videoUrl,
+    this.playbackUrl,
     this.videoType,
+    this.sourceType,
     this.durationSeconds,
     this.isFeatured = false,
     this.publishedAt,
@@ -224,7 +226,9 @@ class VideoItem {
   final String? description;
   final String? thumbnail;
   final String? videoUrl;
+  final String? playbackUrl;
   final String? videoType;
+  final String? sourceType;
   final int? durationSeconds;
   final bool isFeatured;
   final String? publishedAt;
@@ -232,16 +236,33 @@ class VideoItem {
   final int? categoryId;
   final List<VideoItem> related;
 
+  String get resolvedPlaybackUrl =>
+      (playbackUrl != null && playbackUrl!.isNotEmpty) ? playbackUrl! : (videoUrl ?? '');
+
   factory VideoItem.fromJson(Map<String, dynamic> json) {
     final relatedJson = json['related'];
+    final videoUrl = json['video_url'] as String?;
+    final playback = json['playback_url'] as String? ?? videoUrl;
+    var sourceType = json['source_type'] as String?;
+    final videoType = json['video_type'] as String?;
+    if (sourceType == null || sourceType.isEmpty) {
+      if (videoType == 'youtube' ||
+          (videoUrl?.contains('youtu') ?? false)) {
+        sourceType = 'youtube';
+      } else {
+        sourceType = 'file_server';
+      }
+    }
     return VideoItem(
       id: (json['id'] as num?)?.toInt() ?? 0,
       title: json['title'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
       thumbnail: json['thumbnail'] as String?,
-      videoUrl: json['video_url'] as String?,
-      videoType: json['video_type'] as String?,
+      videoUrl: videoUrl,
+      playbackUrl: playback,
+      videoType: videoType,
+      sourceType: sourceType,
       durationSeconds: (json['duration_seconds'] as num?)?.toInt(),
       isFeatured: json['is_featured'] == true || json['is_featured'] == 1,
       publishedAt: json['published_at'] as String?,
@@ -315,7 +336,9 @@ class EpisodeItem {
     this.description,
     this.thumbnail,
     this.videoUrl,
+    this.playbackUrl,
     this.videoType,
+    this.sourceType,
     this.episodeNumber,
     this.durationSeconds,
     this.publishedAt,
@@ -328,12 +351,28 @@ class EpisodeItem {
   final String? description;
   final String? thumbnail;
   final String? videoUrl;
+  final String? playbackUrl;
   final String? videoType;
+  final String? sourceType;
   final int? episodeNumber;
   final int? durationSeconds;
   final String? publishedAt;
 
+  String get resolvedPlaybackUrl =>
+      (playbackUrl != null && playbackUrl!.isNotEmpty) ? playbackUrl! : (videoUrl ?? '');
+
   factory EpisodeItem.fromJson(Map<String, dynamic> json) {
+    final videoUrl = json['video_url'] as String?;
+    final playback = json['playback_url'] as String? ?? videoUrl;
+    var sourceType = json['source_type'] as String?;
+    final videoType = json['video_type'] as String?;
+    if (sourceType == null || sourceType.isEmpty) {
+      if (videoType == 'youtube' || (videoUrl?.contains('youtu') ?? false)) {
+        sourceType = 'youtube';
+      } else {
+        sourceType = 'file_server';
+      }
+    }
     return EpisodeItem(
       id: (json['id'] as num?)?.toInt() ?? 0,
       programId: (json['program_id'] as num?)?.toInt() ?? 0,
@@ -341,8 +380,10 @@ class EpisodeItem {
       slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
       thumbnail: json['thumbnail'] as String?,
-      videoUrl: json['video_url'] as String?,
-      videoType: json['video_type'] as String?,
+      videoUrl: videoUrl,
+      playbackUrl: playback,
+      videoType: videoType,
+      sourceType: sourceType,
       episodeNumber: (json['episode_number'] as num?)?.toInt(),
       durationSeconds: (json['duration_seconds'] as num?)?.toInt(),
       publishedAt: json['published_at'] as String?,

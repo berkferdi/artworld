@@ -8,11 +8,13 @@ import 'package:flutter/foundation.dart';
 ///             --dart-define=MEDIA_BASE_URL=http://10.0.2.2:8080
 /// ```
 ///
-/// Production example:
-/// ```bash
-/// flutter build apk --dart-define=API_BASE_URL=https://api.example.com/api/v1 \
-///                   --dart-define=MEDIA_BASE_URL=https://media.example.com
-/// ```
+  /// Production (unified domain):
+  /// ```bash
+  /// flutter build apk \
+  ///   --dart-define=API_BASE_URL=https://artworldapi.com.tr/api/v1 \
+  ///   --dart-define=MEDIA_BASE_URL=https://artworldapi.com.tr
+  /// ```
+  /// Until DNS/Nginx cutover, API may still be https://api.artworldapi.com.tr/api/v1
 class AppConfig {
   AppConfig._();
 

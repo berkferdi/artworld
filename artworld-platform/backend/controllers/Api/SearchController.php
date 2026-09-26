@@ -6,6 +6,8 @@ namespace App\Controllers\Api;
 
 use App\Core\Request;
 use App\Core\Response;
+use App\Models\GalleryModel;
+use App\Models\InterviewModel;
 use App\Models\NewsModel;
 use App\Models\ProgramModel;
 use App\Models\VideoModel;
@@ -25,11 +27,28 @@ final class SearchController
         $videos = (new VideoModel())->list(['search' => $q, 'sort' => 'latest'], 1, $limit);
         $programs = (new ProgramModel())->list(['search' => $q], 1, $limit);
 
+        $galleries = [];
+        $interviews = [];
+
+        try {
+            $galleries = (new GalleryModel())->list(['search' => $q], 1, $limit)['items'];
+        } catch (\Throwable) {
+            $galleries = [];
+        }
+
+        try {
+            $interviews = (new InterviewModel())->list(['search' => $q], 1, $limit)['items'];
+        } catch (\Throwable) {
+            $interviews = [];
+        }
+
         Response::success([
             'query' => $q,
             'news' => $news['items'],
             'videos' => $videos['items'],
             'programs' => $programs['items'],
+            'galleries' => $galleries,
+            'interviews' => $interviews,
         ], 'Arama sonuçları');
     }
 }

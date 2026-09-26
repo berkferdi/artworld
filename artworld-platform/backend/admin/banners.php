@@ -145,7 +145,23 @@ if ($action === 'create' || $action === 'edit') {
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Pozisyon</label>
-                    <input type="text" name="position" class="form-control" value="<?= e($item['position']) ?>">
+                    <?php
+                    $pos = (string) ($item['position'] ?? 'home_slider_1');
+                    $positions = [
+                        'home_slider_1' => 'Ana Sayfa Slider 1',
+                        'home_slider_2' => 'Ana Sayfa Slider 2',
+                        'home_hero' => 'Home Hero (mobil/eski)',
+                    ];
+                    ?>
+                    <select name="position" class="form-select">
+                        <?php foreach ($positions as $k => $label): ?>
+                            <option value="<?= e($k) ?>" <?= $pos === $k ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                        <?php if (!isset($positions[$pos]) && $pos !== ''): ?>
+                            <option value="<?= e($pos) ?>" selected><?= e($pos) ?> (özel)</option>
+                        <?php endif; ?>
+                    </select>
+                    <div class="form-text">Slider 1 / Slider 2 web ana sayfadaki iki kayar manşet bandıdır.</div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Görsel <?= $item['id'] ? '' : '*' ?></label>

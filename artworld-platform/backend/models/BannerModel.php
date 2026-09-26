@@ -20,12 +20,15 @@ final class BannerModel
     public function active(string $position = 'home_hero'): array
     {
         $stmt = $this->pdo->prepare(
-            "SELECT * FROM banners
-             WHERE status = 'active'
-               AND position = ?
-               AND (starts_at IS NULL OR starts_at <= UTC_TIMESTAMP())
-               AND (expires_at IS NULL OR expires_at >= UTC_TIMESTAMP())
-             ORDER BY sort_order ASC, id DESC"
+            "SELECT b.*, n.slug AS news_slug, n.summary AS news_summary, c.name AS category_name
+             FROM banners b
+             LEFT JOIN news n ON b.target_type = 'news' AND n.id = b.target_id
+             LEFT JOIN categories c ON c.id = n.category_id
+             WHERE b.status = 'active'
+               AND b.position = ?
+               AND (b.starts_at IS NULL OR b.starts_at <= UTC_TIMESTAMP())
+               AND (b.expires_at IS NULL OR b.expires_at >= UTC_TIMESTAMP())
+             ORDER BY b.sort_order ASC, b.id DESC"
         );
         $stmt->execute([$position]);
 
@@ -34,9 +37,15 @@ final class BannerModel
                 'id' => (int) $row['id'],
                 'title' => $row['title'],
                 'image' => Media::url($row['image']),
+                'summary' => $row['news_summary'] ?? null,
+                'category' => [
+                    'name' => $row['category_name'] ?? null,
+                    'slug' => null,
+                ],
                 'target_type' => $row['target_type'],
                 'target_id' => $row['target_id'] !== null ? (int) $row['target_id'] : null,
                 'target_url' => $row['target_url'],
+                'news_slug' => $row['news_slug'] ?? null,
                 'position' => $row['position'],
                 'sort_order' => (int) $row['sort_order'],
             ];
