@@ -45,6 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $categoryId = (int) ($_POST['category_id'] ?? 0) ?: null;
         $isFeatured = checkbox('is_featured');
         $isBreaking = checkbox('is_breaking');
+        $mansetOrder = ($_POST['manset_order'] ?? '') !== '' ? (int) $_POST['manset_order'] : null;
+        $sourceUrl = null_if_empty((string) ($_POST['source_url'] ?? ''));
+        $sourceName = null_if_empty((string) ($_POST['source_name'] ?? ''));
         $status = (string) ($_POST['status'] ?? 'draft');
         if (!in_array($status, ['draft', 'published', 'archived'], true)) {
             $status = 'draft';
@@ -95,22 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($editId) {
             $stmt = $pdo->prepare(
                 'UPDATE news SET category_id=?, title=?, slug=?, summary=?, content=?, cover_image=?, author=?,
-                 is_featured=?, is_breaking=?, status=?, published_at=?, updated_at=UTC_TIMESTAMP() WHERE id=?'
+                 source_url=?, source_name=?, is_featured=?, is_breaking=?, manset_order=?, status=?, published_at=?, updated_at=UTC_TIMESTAMP() WHERE id=?'
             );
             $stmt->execute([
                 $categoryId, $title, $slug, $summary, $content, $cover, $author,
-                $isFeatured, $isBreaking, $status, $publishedAt, $editId,
+                $sourceUrl, $sourceName, $isFeatured, $isBreaking, $mansetOrder, $status, $publishedAt, $editId,
             ]);
             $newsId = $editId;
             flash_set('success', 'Haber güncellendi.');
         } else {
             $stmt = $pdo->prepare(
-                'INSERT INTO news (category_id, title, slug, summary, content, cover_image, author, is_featured, is_breaking, status, published_at, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())'
+                'INSERT INTO news (category_id, title, slug, summary, content, cover_image, author, source_url, source_name, is_featured, is_breaking, manset_order, status, published_at, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())'
             );
             $stmt->execute([
                 $categoryId, $title, $slug, $summary, $content, $cover, $author,
-                $isFeatured, $isBreaking, $status, $publishedAt,
+                $sourceUrl, $sourceName, $isFeatured, $isBreaking, $mansetOrder, $status, $publishedAt,
             ]);
             $newsId = (int) $pdo->lastInsertId();
             flash_set('success', 'Haber oluşturuldu.');
@@ -153,8 +156,11 @@ if ($action === 'create' || $action === 'edit') {
         'content' => '',
         'cover_image' => null,
         'author' => '',
+        'source_url' => '',
+        'source_name' => '',
         'is_featured' => 0,
         'is_breaking' => 0,
+        'manset_order' => null,
         'status' => 'draft',
         'published_at' => null,
     ];
@@ -245,15 +251,29 @@ if ($action === 'create' || $action === 'edit') {
                     <label class="form-label">Yayın tarihi</label>
                     <input type="datetime-local" name="published_at" class="form-control" value="<?= e($publishedLocal) ?>">
                 </div>
-                <div class="col-md-4 d-flex align-items-end gap-3">
+                <div class="col-md-3">
+                    <label class="form-label">Manşet sırası</label>
+                    <input type="number" name="manset_order" class="form-control" min="1" max="99" placeholder="örn. 1"
+                           value="<?= e((string) ($item['manset_order'] ?? '')) ?>">
+                    <div class="form-text">Numaralı manşet bandındaki sıra (1,2,3…)</div>
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-3">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured" value="1" <?= (int) $item['is_featured'] ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="is_featured">Manşet</label>
+                        <label class="form-check-label" for="is_featured">Manşet / Öne çıkan</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="is_breaking" id="is_breaking" value="1" <?= (int) $item['is_breaking'] ? 'checked' : '' ?>>
                         <label class="form-check-label" for="is_breaking">Son dakika</label>
                     </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kaynak adı</label>
+                    <input type="text" name="source_name" class="form-control" value="<?= e((string) ($item['source_name'] ?? '')) ?>" placeholder="Art World">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kaynak URL</label>
+                    <input type="url" name="source_url" class="form-control" value="<?= e((string) ($item['source_url'] ?? '')) ?>" placeholder="https://www.artworld.com.tr/...">
                 </div>
                 <?php if ($item['id']): ?>
                 <div class="col-12">

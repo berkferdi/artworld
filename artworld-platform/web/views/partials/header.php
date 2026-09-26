@@ -24,6 +24,7 @@ $categoryNav = [
     ['title' => 'Ekonomi', 'url' => url('/ekonomi'), 'slug' => 'ekonomi'],
     ['title' => 'Kültür Sanat', 'url' => url('/kultur-sanat'), 'slug' => 'kultur-sanat'],
     ['title' => 'Teknoloji', 'url' => url('/teknoloji'), 'slug' => 'teknoloji'],
+    ['title' => 'Antalya', 'url' => url('/antalya'), 'slug' => 'antalya'],
 ];
 
 // Merge any extra API menu items not already covered

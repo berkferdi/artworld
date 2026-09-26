@@ -1,35 +1,172 @@
 <?php
 /** @var array $breaking */
-/** @var array $slider */
-/** @var array $rail */
+/** @var array|null $live */
+/** @var array $slider1 */
+/** @var array $slider2 */
 /** @var array|null $featuredMain */
 /** @var array $featuredSide */
-/** @var array $categoryBlocks */
+/** @var array $manset */
+/** @var array $primaryBlocks */
+/** @var array $secondaryBlocks */
+/** @var array $mostRead */
+/** @var array $selected */
 /** @var array $latest */
 /** @var array $videos */
-/** @var array $programs */
-/** @var array|null $live */
-/** @var array $mostRead */
-/** @var array $galleries */
-/** @var array $authors */
-/** @var array $interviews */
 
-$slider = $slider ?? [];
-$rail = $rail ?? [];
+$slider1 = $slider1 ?? [];
+$slider2 = $slider2 ?? [];
 $featuredMain = $featuredMain ?? null;
 $featuredSide = $featuredSide ?? [];
-$categoryBlocks = $categoryBlocks ?? [];
-$galleries = $galleries ?? [];
-$authors = $authors ?? [];
-$interviews = $interviews ?? [];
+$manset = $manset ?? [];
+$primaryBlocks = $primaryBlocks ?? [];
+$secondaryBlocks = $secondaryBlocks ?? [];
 $mostRead = $mostRead ?? [];
+$selected = $selected ?? [];
+$latest = $latest ?? [];
 $videos = $videos ?? [];
-$live = $live ?? null;
+$breakingItems = array_slice($breaking ?? [], 0, 12);
 
-$videoMain = $videos[0] ?? null;
-$videoSide = array_slice($videos, 1, 3);
+$renderCarousel = static function (array $slides, string $id): void {
+    if ($slides === []) {
+        return;
+    }
+    ?>
+    <div class="news-carousel" data-news-carousel id="<?= e($id) ?>" aria-roledescription="carousel">
+        <div class="news-carousel__viewport">
+            <?php foreach ($slides as $i => $slide): ?>
+                <a class="news-carousel__slide<?= $i === 0 ? ' is-active' : '' ?>"
+                   href="<?= e((string) ($slide['href'] ?? '#')) ?>"
+                   data-cslide="<?= $i ?>"
+                   <?= $i === 0 ? '' : 'tabindex="-1" aria-hidden="true"' ?>>
+                    <img src="<?= e((string) $slide['image']) ?>"
+                         alt=""
+                         width="1600" height="640"
+                         <?= $i === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' ?>>
+                    <div class="news-carousel__shade" aria-hidden="true"></div>
+                    <div class="news-carousel__copy">
+                        <?php if (!empty($slide['category'])): ?>
+                            <span class="eyebrow"><?= e((string) $slide['category']) ?></span>
+                        <?php endif; ?>
+                        <h3><?= e((string) ($slide['title'] ?? '')) ?></h3>
+                        <?php if (!empty($slide['summary'])): ?>
+                            <p><?= e(truncate((string) $slide['summary'], 140)) ?></p>
+                        <?php endif; ?>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+            <?php if (count($slides) > 1): ?>
+                <div class="news-carousel__nav">
+                    <button type="button" data-c-prev aria-label="Önceki">‹</button>
+                    <button type="button" data-c-next aria-label="Sonraki">›</button>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php if (count($slides) > 1): ?>
+            <div class="news-carousel__dots" data-c-dots>
+                <?php foreach ($slides as $i => $_): ?>
+                    <button type="button" data-c-dot="<?= $i ?>" class="<?= $i === 0 ? 'is-active' : '' ?>" aria-label="Slayt <?= $i + 1 ?>"></button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php
+};
 
-$breakingItems = array_slice($breaking ?? [], 0, 10);
+$renderCatColumn = static function (array $block): void {
+    $items = is_array($block['items'] ?? null) ? $block['items'] : [];
+    $slug = (string) ($block['slug'] ?? '');
+    $name = (string) ($block['name'] ?? '');
+    $main = $items[0] ?? null;
+    $rest = array_slice($items, 1, 4);
+    ?>
+    <div class="cat-col">
+        <header class="section-head section-head--row">
+            <h2><?= e($name) ?></h2>
+            <a href="<?= e(url('/' . $slug)) ?>">Tümünü Gör</a>
+        </header>
+        <?php if (!$main): ?>
+            <p class="empty">Bu kategoride henüz haber yok.</p>
+        <?php else: ?>
+            <a class="cat-col__main" href="<?= e(news_url((string) ($main['slug'] ?? ''))) ?>">
+                <div class="cat-col__media">
+                    <?php if (!empty($main['cover_image'])): ?>
+                        <img src="<?= e((string) $main['cover_image']) ?>" alt="" loading="lazy" width="640" height="400">
+                    <?php else: ?>
+                        <div class="media-fallback"></div>
+                    <?php endif; ?>
+                </div>
+                <div class="cat-col__body">
+                    <span class="badge"><?= e($name) ?></span>
+                    <h3><?= e((string) ($main['title'] ?? '')) ?></h3>
+                    <?php if (!empty($main['published_at'])): ?>
+                        <time datetime="<?= e((string) $main['published_at']) ?>"><?= e(format_date((string) $main['published_at'])) ?></time>
+                    <?php endif; ?>
+                </div>
+            </a>
+            <div class="cat-col__list">
+                <?php foreach ($rest as $item): ?>
+                    <a class="cat-list-item" href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>">
+                        <?php if (!empty($item['cover_image'])): ?>
+                            <img src="<?= e((string) $item['cover_image']) ?>" alt="" loading="lazy" width="88" height="64">
+                        <?php else: ?>
+                            <div class="media-fallback" style="width:88px;height:64px;border-radius:4px"></div>
+                        <?php endif; ?>
+                        <div>
+                            <h4><?= e((string) ($item['title'] ?? '')) ?></h4>
+                            <?php if (!empty($item['published_at'])): ?>
+                                <time datetime="<?= e((string) $item['published_at']) ?>"><?= e(format_date((string) $item['published_at'])) ?></time>
+                            <?php endif; ?>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php
+};
+
+$renderPickCol = static function (string $title, array $items): void {
+    $items = array_slice($items, 0, 7);
+    $main = $items[0] ?? null;
+    $rest = array_slice($items, 1, 6);
+    ?>
+    <div class="pick-col">
+        <header class="section-head"><h2><?= e($title) ?></h2></header>
+        <?php if ($main): ?>
+            <a class="pick-col__main" href="<?= e(news_url((string) ($main['slug'] ?? ''))) ?>">
+                <div class="pick-col__media">
+                    <?php if (!empty($main['cover_image'])): ?>
+                        <img src="<?= e((string) $main['cover_image']) ?>" alt="" loading="lazy" width="640" height="360">
+                    <?php else: ?>
+                        <div class="media-fallback"></div>
+                    <?php endif; ?>
+                </div>
+                <h3><?= e((string) ($main['title'] ?? '')) ?></h3>
+                <?php if (!empty($main['published_at'])): ?>
+                    <time datetime="<?= e((string) $main['published_at']) ?>"><?= e(format_date((string) $main['published_at'])) ?></time>
+                <?php endif; ?>
+            </a>
+        <?php endif; ?>
+        <ul class="pick-col__list">
+            <?php foreach ($rest as $item): ?>
+                <li>
+                    <a href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>">
+                        <?php if (!empty($item['cover_image'])): ?>
+                            <img src="<?= e((string) $item['cover_image']) ?>" alt="" loading="lazy" width="72" height="52">
+                        <?php endif; ?>
+                        <span>
+                            <strong><?= e((string) ($item['title'] ?? '')) ?></strong>
+                            <?php if (!empty($item['published_at'])): ?>
+                                <time datetime="<?= e((string) $item['published_at']) ?>"><?= e(format_date((string) $item['published_at'])) ?></time>
+                            <?php endif; ?>
+                        </span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php
+};
 ?>
 
 <?php if ($breakingItems !== []): ?>
@@ -52,74 +189,45 @@ $breakingItems = array_slice($breaking ?? [], 0, 10);
         </div>
     </div>
 </div>
-<?php else: ?>
-<div class="breaking-ticker breaking-ticker--empty" aria-hidden="true">
-    <span class="breaking-ticker__badge">Son Dakika</span>
-    <div class="breaking-ticker__track"></div>
-</div>
 <?php endif; ?>
 
-<?php if ($slider !== []): ?>
-<section class="hero-slider" data-hero-slider aria-roledescription="carousel" aria-label="Manşet haberler">
-    <div class="hero-slider__viewport">
-        <?php foreach ($slider as $i => $item): ?>
-            <a class="hero-slide<?= $i === 0 ? ' is-active' : '' ?>"
-               href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>"
-               data-slide="<?= $i ?>"
-               <?= $i === 0 ? '' : 'tabindex="-1" aria-hidden="true"' ?>>
-                <?php if (!empty($item['cover_image'])): ?>
-                    <img src="<?= e((string) $item['cover_image']) ?>"
-                         alt=""
-                         width="1600" height="686"
-                         <?= $i === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"' ?>>
-                <?php endif; ?>
-                <div class="hero-slide__shade" aria-hidden="true"></div>
-                <div class="hero-slide__copy">
-                    <?php if (!empty($item['category']['name'])): ?>
-                        <span class="eyebrow"><?= e((string) $item['category']['name']) ?></span>
-                    <?php endif; ?>
-                    <h2><?= e((string) ($item['title'] ?? '')) ?></h2>
-                    <?php if (!empty($item['summary'])): ?>
-                        <p><?= e(truncate((string) $item['summary'], 160)) ?></p>
-                    <?php endif; ?>
+<section class="live-section live-section--top" id="canli-yayin">
+    <div class="shell">
+        <div class="live-section__head">
+            <div class="live-section__brand">
+                <span class="live-dot" aria-hidden="true" style="background:var(--danger);box-shadow:0 0 0 0 rgba(225,29,46,.55)"></span>
+                <h2>Canlı Art World TV</h2>
+            </div>
+            <p class="live-section__sub"><?= e((string) ($live['title'] ?? 'Art World Canlı Yayın')) ?></p>
+        </div>
+        <?php if (!empty($live['stream_url'])): ?>
+            <div class="player-frame player-frame--home player-frame--compact"
+                 id="home-live-player"
+                 data-live-player
+                 data-src="<?= e((string) $live['stream_url']) ?>"
+                 data-type="<?= e((string) ($live['stream_type'] ?? 'hls')) ?>"
+                 data-poster="<?= e((string) ($live['poster_image'] ?? '')) ?>">
+                <video id="home-live-video" playsinline muted controls poster="<?= e((string) ($live['poster_image'] ?? '')) ?>"></video>
+                <div class="player-overlay" data-unmute-overlay>
+                    <button type="button" class="btn btn--primary" data-unmute>Sesi Aç</button>
+                    <a class="btn btn--ghost" href="<?= e(url('/canli-yayin')) ?>">Tam Ekran</a>
                 </div>
-            </a>
-        <?php endforeach; ?>
-        <?php if (count($slider) > 1): ?>
-            <div class="hero-slider__nav">
-                <button type="button" data-hero-prev aria-label="Önceki haber">‹</button>
-                <button type="button" data-hero-next aria-label="Sonraki haber">›</button>
+            </div>
+        <?php else: ?>
+            <div class="player-frame player-frame--home player-frame--compact player-frame--empty">
+                <p>Canlı yayın şu anda kullanılamıyor.</p>
+                <a class="btn btn--ghost" href="<?= e(url('/canli-yayin')) ?>">Canlı sayfasını aç</a>
             </div>
         <?php endif; ?>
     </div>
-    <?php if (count($slider) > 1): ?>
-        <div class="hero-slider__dots" data-hero-dots>
-            <?php foreach ($slider as $i => $_): ?>
-                <button type="button" data-hero-dot="<?= $i ?>" class="<?= $i === 0 ? 'is-active' : '' ?>" aria-label="Slayt <?= $i + 1 ?>"></button>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 </section>
-<?php endif; ?>
 
-<?php if ($rail !== []): ?>
-<section class="headline-rail" aria-label="Manşet bandı">
+<section class="section section--carousels">
     <div class="shell">
-        <div class="headline-rail__track" data-headline-rail>
-            <?php foreach ($rail as $item): ?>
-                <a class="headline-card" href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>">
-                    <?php if (!empty($item['cover_image'])): ?>
-                        <img src="<?= e((string) $item['cover_image']) ?>" alt="" loading="lazy" width="96" height="68">
-                    <?php else: ?>
-                        <div class="media-fallback" style="width:96px;height:68px;border-radius:4px"></div>
-                    <?php endif; ?>
-                    <span><?= e((string) ($item['title'] ?? '')) ?></span>
-                </a>
-            <?php endforeach; ?>
-        </div>
+        <?php $renderCarousel($slider1, 'carousel-1'); ?>
+        <?php $renderCarousel($slider2, 'carousel-2'); ?>
     </div>
 </section>
-<?php endif; ?>
 
 <?php if ($featuredMain || $featuredSide !== []): ?>
 <section class="section">
@@ -154,110 +262,102 @@ $breakingItems = array_slice($breaking ?? [], 0, 10);
 </section>
 <?php endif; ?>
 
-<?php foreach ($categoryBlocks as $block): ?>
-    <?php
-    $items = is_array($block['items'] ?? null) ? $block['items'] : [];
-    if ($items === []) {
-        continue;
-    }
-    $main = $items[0];
-    $rest = array_slice($items, 1, 4);
-    $slug = (string) ($block['slug'] ?? '');
-    $name = (string) ($block['name'] ?? '');
-    ?>
-<section class="section<?= ($slug === 'spor' || $slug === 'kultur-sanat') ? ' section--alt' : '' ?>">
+<?php if ($manset !== []): ?>
+<section class="section section--alt">
     <div class="shell">
-        <header class="section-head section-head--row">
-            <h2><?= e($name) ?></h2>
-            <a href="<?= e(url('/' . $slug)) ?>">Tümünü Gör</a>
-        </header>
-        <div class="cat-block">
-            <a class="cat-block__main" href="<?= e(news_url((string) ($main['slug'] ?? ''))) ?>">
-                <?php if (!empty($main['cover_image'])): ?>
-                    <img src="<?= e((string) $main['cover_image']) ?>" alt="" loading="lazy" width="800" height="500">
+        <header class="section-head"><h2>Manşet Haberler</h2></header>
+        <div class="manset" data-manset>
+            <a class="manset__stage" data-manset-stage href="<?= e(news_url((string) ($manset[0]['slug'] ?? ''))) ?>">
+                <?php if (!empty($manset[0]['cover_image'])): ?>
+                    <img data-manset-img src="<?= e((string) $manset[0]['cover_image']) ?>" alt="" width="1100" height="620" loading="eager">
                 <?php endif; ?>
-                <div class="copy">
-                    <span class="eyebrow"><?= e($name) ?></span>
-                    <h3><?= e((string) ($main['title'] ?? '')) ?></h3>
-                    <?php if (!empty($main['published_at'])): ?>
-                        <time datetime="<?= e((string) $main['published_at']) ?>"><?= e(format_date((string) $main['published_at'])) ?></time>
-                    <?php endif; ?>
+                <div class="manset__copy">
+                    <span class="eyebrow" data-manset-cat><?= e((string) ($manset[0]['category']['name'] ?? '')) ?></span>
+                    <h3 data-manset-title><?= e((string) ($manset[0]['title'] ?? '')) ?></h3>
+                    <p data-manset-summary><?= e(truncate((string) ($manset[0]['summary'] ?? ''), 160)) ?></p>
                 </div>
             </a>
-            <?php if ($rest !== []): ?>
-                <div class="cat-block__list">
-                    <?php foreach ($rest as $item): ?>
-                        <a class="cat-list-item" href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>">
-                            <?php if (!empty($item['cover_image'])): ?>
-                                <img src="<?= e((string) $item['cover_image']) ?>" alt="" loading="lazy" width="88" height="64">
-                            <?php else: ?>
-                                <div class="media-fallback" style="width:88px;height:64px;border-radius:4px"></div>
-                            <?php endif; ?>
-                            <div>
-                                <span class="badge"><?= e($name) ?></span>
-                                <h4><?= e((string) ($item['title'] ?? '')) ?></h4>
-                                <?php if (!empty($item['published_at'])): ?>
-                                    <time datetime="<?= e((string) $item['published_at']) ?>"><?= e(format_date((string) $item['published_at'])) ?></time>
-                                <?php endif; ?>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-<?php endforeach; ?>
-
-<section class="section section--alt">
-    <div class="shell home-split">
-        <div>
-            <header class="section-head section-head--row">
-                <h2>Son Eklenenler</h2>
-                <a href="<?= e(url('/arsiv')) ?>">Arşiv</a>
-            </header>
-            <?php if (empty($latest)): ?>
-                <p class="empty">Henüz haber yok.</p>
-            <?php else: ?>
-                <div class="news-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
-                    <?php foreach (array_slice($latest, 0, 6) as $item): ?>
-                        <?php \Web\Core\View::partial('partials/news-tile', ['item' => $item]); ?>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-        <aside>
-            <header class="section-head"><h2>Çok Okunanlar</h2></header>
-            <?php if (empty($mostRead)): ?>
-                <p class="empty">Veri yok.</p>
-            <?php else: ?>
-                <ol class="ranked-list">
-                    <?php foreach (array_slice($mostRead, 0, 5) as $i => $item): ?>
+            <div class="manset__side">
+                <ol class="manset__list" data-manset-list>
+                    <?php foreach (array_slice($manset, 0, 8) as $i => $item): ?>
                         <li>
-                            <span class="rank"><?= $i + 1 ?></span>
-                            <?php if (!empty($item['cover_image'])): ?>
-                                <a href="<?= e(news_url((string) $item['slug'])) ?>">
-                                    <img src="<?= e((string) $item['cover_image']) ?>" alt="" loading="lazy" width="72" height="52">
-                                </a>
-                            <?php else: ?>
-                                <div class="media-fallback" style="width:72px;height:52px;border-radius:4px"></div>
-                            <?php endif; ?>
-                            <a href="<?= e(news_url((string) $item['slug'])) ?>"><?= e((string) $item['title']) ?></a>
+                            <button type="button"
+                                    class="manset__item<?= $i === 0 ? ' is-active' : '' ?>"
+                                    data-manset-item
+                                    data-index="<?= $i ?>"
+                                    data-href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>"
+                                    data-img="<?= e((string) ($item['cover_image'] ?? '')) ?>"
+                                    data-title="<?= e((string) ($item['title'] ?? '')) ?>"
+                                    data-summary="<?= e(truncate((string) ($item['summary'] ?? ''), 160)) ?>"
+                                    data-cat="<?= e((string) ($item['category']['name'] ?? '')) ?>">
+                                <span class="manset__num"><?= $i + 1 ?></span>
+                                <span class="manset__item-title"><?= e((string) ($item['title'] ?? '')) ?></span>
+                            </button>
                         </li>
                     <?php endforeach; ?>
                 </ol>
-            <?php endif; ?>
-        </aside>
+            </div>
+        </div>
+        <div class="manset__pager" data-manset-pager aria-label="Manşet numaraları">
+            <?php foreach ($manset as $i => $item): ?>
+                <button type="button"
+                        class="<?= $i === 0 ? 'is-active' : '' ?>"
+                        data-manset-page="<?= $i ?>"
+                        data-href="<?= e(news_url((string) ($item['slug'] ?? ''))) ?>"
+                        data-img="<?= e((string) ($item['cover_image'] ?? '')) ?>"
+                        data-title="<?= e((string) ($item['title'] ?? '')) ?>"
+                        data-summary="<?= e(truncate((string) ($item['summary'] ?? ''), 160)) ?>"
+                        data-cat="<?= e((string) ($item['category']['name'] ?? '')) ?>"><?= $i + 1 ?></button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<section class="section">
+    <div class="shell">
+        <div class="cat-trio">
+            <?php foreach ($primaryBlocks as $block): ?>
+                <?php $renderCatColumn($block); ?>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 
-<?php if ($videoMain || $videoSide !== []): ?>
+<section class="section section--alt">
+    <div class="shell">
+        <div class="picks-trio">
+            <?php $renderPickCol('Çok Okunanlar', $mostRead); ?>
+            <?php $renderPickCol('Sizin İçin Seçtiklerimiz', $selected); ?>
+            <?php $renderPickCol('Son Eklenenler', $latest); ?>
+        </div>
+    </div>
+</section>
+
+<?php if ($secondaryBlocks !== []): ?>
 <section class="section">
+    <div class="shell">
+        <header class="section-head"><h2>Diğer Kategoriler</h2></header>
+        <div class="cat-grid">
+            <?php foreach ($secondaryBlocks as $block): ?>
+                <?php $renderCatColumn($block); ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($videos !== []): ?>
+<section class="section section--alt">
     <div class="shell">
         <header class="section-head section-head--row">
             <h2>Videolar</h2>
             <a href="<?= e(url('/videolar')) ?>">Tüm Videolar</a>
         </header>
+        <?php
+        $videoMain = $videos[0] ?? null;
+        $videoSide = array_slice($videos, 1, 3);
+        ?>
         <div class="video-spotlight">
             <?php if ($videoMain): ?>
                 <a class="video-card" href="<?= e(video_url((string) $videoMain['slug'])) ?>">
@@ -268,9 +368,6 @@ $breakingItems = array_slice($breaking ?? [], 0, 10);
                         <span class="play-badge" aria-hidden="true">▶</span>
                     </div>
                     <h3><?= e((string) $videoMain['title']) ?></h3>
-                    <?php if (!empty($videoMain['duration_seconds'])): ?>
-                        <span class="meta"><?= e((string) gmdate('H:i:s', (int) $videoMain['duration_seconds'])) ?></span>
-                    <?php endif; ?>
                 </a>
             <?php endif; ?>
             <?php if ($videoSide !== []): ?>
@@ -293,130 +390,6 @@ $breakingItems = array_slice($breaking ?? [], 0, 10);
 </section>
 <?php endif; ?>
 
-<section class="live-section" id="canli-yayin">
-    <div class="shell">
-        <div class="live-section__head">
-            <div class="live-section__brand">
-                <span class="live-dot" aria-hidden="true" style="background:var(--danger);box-shadow:0 0 0 0 rgba(225,29,46,.55)"></span>
-                <h2>Canlı Art World TV</h2>
-            </div>
-            <p class="live-section__sub"><?= e((string) ($live['title'] ?? 'Art World Canlı Yayın')) ?></p>
-        </div>
-
-        <?php if (!empty($live['stream_url'])): ?>
-            <div class="player-frame player-frame--home"
-                 id="home-live-player"
-                 data-live-player
-                 data-src="<?= e((string) $live['stream_url']) ?>"
-                 data-type="<?= e((string) ($live['stream_type'] ?? 'hls')) ?>"
-                 data-poster="<?= e((string) ($live['poster_image'] ?? '')) ?>">
-                <video id="home-live-video"
-                       playsinline
-                       muted
-                       controls
-                       poster="<?= e((string) ($live['poster_image'] ?? '')) ?>"></video>
-                <div class="player-overlay" data-unmute-overlay>
-                    <button type="button" class="btn btn--primary" data-unmute>Sesi Aç</button>
-                    <a class="btn btn--ghost" href="<?= e(url('/canli-yayin')) ?>">Tam Ekran</a>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="player-frame player-frame--home player-frame--empty">
-                <p>Canlı yayın şu anda kullanılamıyor.</p>
-                <a class="btn btn--ghost" href="<?= e(url('/canli-yayin')) ?>">Canlı sayfasını aç</a>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
-
-<?php if (!empty($programs)): ?>
-<section class="section">
-    <div class="shell">
-        <header class="section-head section-head--row">
-            <h2>Programlar</h2>
-            <a href="<?= e(url('/programlar')) ?>">Tümü</a>
-        </header>
-        <div class="program-grid">
-            <?php foreach (array_slice($programs, 0, 6) as $program): ?>
-                <a class="program-card" href="<?= e(program_url((string) $program['slug'])) ?>">
-                    <?php if (!empty($program['cover_image'])): ?>
-                        <img src="<?= e((string) $program['cover_image']) ?>" alt="" loading="lazy" width="320" height="180">
-                    <?php endif; ?>
-                    <div>
-                        <h3><?= e((string) $program['title']) ?></h3>
-                        <?php if (!empty($program['presenter'])): ?>
-                            <p><?= e((string) $program['presenter']) ?></p>
-                        <?php endif; ?>
-                        <?php if (!empty($program['broadcast_day'])): ?>
-                            <span class="meta"><?= e((string) $program['broadcast_day']) ?></span>
-                        <?php endif; ?>
-                        <?php if (!empty($program['summary'])): ?>
-                            <p><?= e(truncate((string) $program['summary'], 90)) ?></p>
-                        <?php endif; ?>
-                    </div>
-                </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<?php if (!empty($galleries)): ?>
-<section class="section section--alt">
-    <div class="shell">
-        <header class="section-head section-head--row">
-            <h2>Foto Galeri</h2>
-            <a href="<?= e(url('/foto-galeri')) ?>">Tümü</a>
-        </header>
-        <div class="gallery-grid">
-            <?php foreach (array_slice($galleries, 0, 4) as $g): ?>
-                <a class="news-tile" href="<?= e(gallery_url((string) $g['slug'])) ?>">
-                    <div class="news-tile__media">
-                        <?php if (!empty($g['cover_image'])): ?>
-                            <img src="<?= e((string) $g['cover_image']) ?>" alt="" loading="lazy" width="480" height="300">
-                        <?php else: ?><div class="media-fallback"></div><?php endif; ?>
-                    </div>
-                    <div class="news-tile__body"><h3><?= e((string) $g['title']) ?></h3></div>
-                </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<?php if (!empty($authors) || !empty($interviews)): ?>
-<section class="section">
-    <div class="shell dual-cols">
-        <?php if (!empty($authors)): ?>
-            <div>
-                <header class="section-head section-head--row">
-                    <h2>Yazarlar</h2>
-                    <a href="<?= e(url('/yazarlar')) ?>">Tümü</a>
-                </header>
-                <ul class="plain-list">
-                    <?php foreach (array_slice($authors, 0, 5) as $a): ?>
-                        <li><a href="<?= e(author_url((string) $a['slug'])) ?>"><?= e((string) $a['name']) ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-        <?php if (!empty($interviews)): ?>
-            <div>
-                <header class="section-head section-head--row">
-                    <h2>Röportajlar</h2>
-                    <a href="<?= e(url('/roportajlar')) ?>">Tümü</a>
-                </header>
-                <ul class="plain-list">
-                    <?php foreach (array_slice($interviews, 0, 5) as $iv): ?>
-                        <li><a href="<?= e(interview_url((string) $iv['slug'])) ?>"><?= e((string) $iv['title']) ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
-<?php endif; ?>
-
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -426,14 +399,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var src = root.getAttribute('data-src');
   var type = root.getAttribute('data-type') || 'hls';
   if (!src) return;
-
   function tryPlay() {
     var p = video.play();
     if (p && typeof p.catch === 'function') {
       p.catch(function () { video.muted = true; video.play().catch(function(){}); });
     }
   }
-
   if (type === 'hls' && window.Hls && Hls.isSupported()) {
     var hls = new Hls({ enableWorker: true });
     hls.loadSource(src);
@@ -446,7 +417,6 @@ document.addEventListener('DOMContentLoaded', function () {
     video.src = src;
     tryPlay();
   }
-
   var unmuteBtn = root.querySelector('[data-unmute]');
   var overlay = root.querySelector('[data-unmute-overlay]');
   if (unmuteBtn) {

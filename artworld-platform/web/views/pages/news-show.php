@@ -20,6 +20,13 @@ $mostRead = $mostRead ?? [];
                     <span><?= e((string) $news['author']) ?></span>
                 <?php endif; ?>
                 <time datetime="<?= e((string) ($news['published_at'] ?? '')) ?>"><?= e(format_date((string) ($news['published_at'] ?? ''))) ?></time>
+                <?php if (!empty($news['source_url'])): ?>
+                    <span>Kaynak:
+                        <a href="<?= e((string) $news['source_url']) ?>" target="_blank" rel="noopener noreferrer">
+                            <?= e((string) ($news['source_name'] ?? 'Art World')) ?>
+                        </a>
+                    </span>
+                <?php endif; ?>
             </div>
         </header>
 

@@ -45,6 +45,10 @@ $router->get('/spor', [CategoryController::class, 'show'], ['slug' => 'spor']);
 $router->get('/ekonomi', [CategoryController::class, 'show'], ['slug' => 'ekonomi']);
 $router->get('/kultur-sanat', [CategoryController::class, 'show'], ['slug' => 'kultur-sanat']);
 $router->get('/teknoloji', [CategoryController::class, 'show'], ['slug' => 'teknoloji']);
+$router->get('/antalya', [CategoryController::class, 'show'], ['slug' => 'antalya']);
+$router->get('/asayis', [CategoryController::class, 'show'], ['slug' => 'asayis']);
+$router->get('/saglik', [CategoryController::class, 'show'], ['slug' => 'saglik']);
+$router->get('/turizm', [CategoryController::class, 'show'], ['slug' => 'turizm']);
 $router->get('/arama', [SearchController::class, 'index']);
 $router->get('/arsiv', [ArchiveController::class, 'index']);
 
