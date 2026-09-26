@@ -84,6 +84,30 @@ ob_start();
             <div class="stat-sub"><?= $live ? e($live['title']) : 'Aktif yayın yok' ?></div>
         </div>
     </div>
+    <?php
+    $fileServerStatus = ['reachable' => false, 'detail' => 'Kontrol edilemedi'];
+    try {
+        $fileServerStatus = (new \App\Services\FileServerService())->probe();
+    } catch (Throwable) {
+        $fileServerStatus = ['reachable' => false, 'detail' => 'Probe hatası'];
+    }
+    ?>
+    <div class="col-12 col-lg-6">
+        <div class="stat-card">
+            <div class="stat-label">File Server</div>
+            <div class="stat-value" style="font-size:1.15rem;">
+                <?php if (!empty($fileServerStatus['reachable'])): ?>
+                    <span class="text-success">✓ Online</span>
+                <?php else: ?>
+                    <span class="text-warning">✗ Offline / Pending</span>
+                <?php endif; ?>
+            </div>
+            <div class="stat-sub"><?= e((string) ($fileServerStatus['detail'] ?? '')) ?></div>
+            <div class="mt-2">
+                <a class="btn btn-sm btn-outline-secondary" href="<?= e(admin_url('file_server.php')) ?>">Ayarlar &amp; Test</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">

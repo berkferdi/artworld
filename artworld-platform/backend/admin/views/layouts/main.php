@@ -62,12 +62,37 @@ $appName = (string) (\App\Core\Config::get('APP_NAME', 'Art World Mobile'));
             <a class="nav-link <?= active_menu('live.php') ?>" href="<?= e(admin_url('live.php')) ?>">
                 <i class="bi bi-broadcast"></i> Canlı Yayın
             </a>
+            <div class="nav-section">Web</div>
+            <a class="nav-link <?= active_menu('pages.php') ?>" href="<?= e(admin_url('pages.php')) ?>">
+                <i class="bi bi-file-earmark-text"></i> Sayfalar
+            </a>
+            <a class="nav-link <?= active_menu('authors.php') ?>" href="<?= e(admin_url('authors.php')) ?>">
+                <i class="bi bi-person-badge"></i> Yazarlar
+            </a>
+            <a class="nav-link <?= active_menu('galleries.php') ?>" href="<?= e(admin_url('galleries.php')) ?>">
+                <i class="bi bi-images"></i> Galeriler
+            </a>
+            <a class="nav-link <?= active_menu('interviews.php') ?>" href="<?= e(admin_url('interviews.php')) ?>">
+                <i class="bi bi-mic"></i> Röportajlar
+            </a>
+            <a class="nav-link <?= active_menu('ads.php') ?>" href="<?= e(admin_url('ads.php')) ?>">
+                <i class="bi bi-badge-ad"></i> Reklamlar
+            </a>
+            <a class="nav-link <?= active_menu('menus.php') ?>" href="<?= e(admin_url('menus.php')) ?>">
+                <i class="bi bi-list-nested"></i> Menüler
+            </a>
+            <a class="nav-link <?= active_menu('services.php') ?>" href="<?= e(admin_url('services.php')) ?>">
+                <i class="bi bi-puzzle"></i> Servisler
+            </a>
             <div class="nav-section">Sistem</div>
             <a class="nav-link <?= active_menu('notifications.php') ?>" href="<?= e(admin_url('notifications.php')) ?>">
                 <i class="bi bi-bell"></i> Bildirimler
             </a>
             <a class="nav-link <?= active_menu('settings.php') ?>" href="<?= e(admin_url('settings.php')) ?>">
                 <i class="bi bi-gear"></i> Ayarlar
+            </a>
+            <a class="nav-link <?= active_menu('file_server.php') ?>" href="<?= e(admin_url('file_server.php')) ?>">
+                <i class="bi bi-hdd-network"></i> File Server
             </a>
             <?php if (\App\Core\Auth::isSuperAdmin()): ?>
             <a class="nav-link <?= active_menu('admins.php') ?>" href="<?= e(admin_url('admins.php')) ?>">

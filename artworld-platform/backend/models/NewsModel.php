@@ -38,6 +38,10 @@ final class NewsModel
             $params[] = $term;
             $params[] = $term;
         }
+        if (!empty($filters['date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $filters['date'])) {
+            $where[] = 'DATE(n.published_at) = ?';
+            $params[] = $filters['date'];
+        }
 
         $sort = $filters['sort'] ?? 'latest';
         $orderBy = match ($sort) {
