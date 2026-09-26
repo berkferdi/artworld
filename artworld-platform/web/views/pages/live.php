@@ -1,10 +1,13 @@
 <?php /** @var array|null $live */ ?>
-<section class="section live-page">
+<section class="live-section live-page">
     <div class="shell">
-        <header class="section-head">
-            <h1>Canlı Yayın</h1>
-            <p><?= e((string) ($live['title'] ?? 'Art World TV')) ?></p>
-        </header>
+        <div class="live-section__head">
+            <div class="live-section__brand">
+                <span class="live-dot" aria-hidden="true" style="background:var(--danger)"></span>
+                <h2>Canlı Yayın</h2>
+            </div>
+            <p class="live-section__sub"><?= e((string) ($live['title'] ?? 'Art World TV')) ?></p>
+        </div>
         <div class="player-frame player-frame--cinema" id="live-player-root"
              data-src="<?= e((string) ($live['stream_url'] ?? '')) ?>"
              data-type="<?= e((string) ($live['stream_type'] ?? 'hls')) ?>">
@@ -15,7 +18,7 @@
             <?php endif; ?>
         </div>
         <?php if (!empty($live['description'])): ?>
-            <div class="prose live-desc"><p><?= nl2br(e((string) $live['description'])) ?></p></div>
+            <div class="prose live-desc" style="margin-top:1rem"><p><?= nl2br(e((string) $live['description'])) ?></p></div>
         <?php endif; ?>
     </div>
 </section>

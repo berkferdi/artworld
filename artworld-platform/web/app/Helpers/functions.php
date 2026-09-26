@@ -112,13 +112,15 @@ function default_menu(?array $settings = null): array
 {
     return [
         ['title' => 'Ana Sayfa', 'url' => url('/')],
-        ['title' => 'Canlı Yayın', 'url' => url('/canli')],
-        ['title' => 'Videolar', 'url' => url('/video')],
+        ['title' => 'Canlı Yayın', 'url' => url('/canli-yayin')],
+        ['title' => 'Videolar', 'url' => url('/videolar')],
         ['title' => 'Programlar', 'url' => url('/programlar')],
         ['title' => 'Foto Galeri', 'url' => url('/foto-galeri')],
-        ['title' => 'Yazarlar', 'url' => url('/yazarlar')],
-        ['title' => 'Röportajlar', 'url' => url('/roportajlar')],
-        ['title' => 'Arşiv', 'url' => url('/arsiv')],
         ['title' => 'İletişim', 'url' => url('/iletisim')],
+        ['title' => 'Gündem', 'url' => url('/gundem')],
+        ['title' => 'Spor', 'url' => url('/spor')],
+        ['title' => 'Ekonomi', 'url' => url('/ekonomi')],
+        ['title' => 'Kültür Sanat', 'url' => url('/kultur-sanat')],
+        ['title' => 'Teknoloji', 'url' => url('/teknoloji')],
     ];
 }

@@ -19,13 +19,15 @@ final class SeoController extends BaseController
     {
         $urls = [
             ['loc' => absolute_url('/'), 'changefreq' => 'hourly', 'priority' => '1.0'],
-            ['loc' => absolute_url('/canli'), 'changefreq' => 'hourly', 'priority' => '0.9'],
-            ['loc' => absolute_url('/video'), 'changefreq' => 'daily', 'priority' => '0.8'],
+            ['loc' => absolute_url('/canli-yayin'), 'changefreq' => 'hourly', 'priority' => '0.9'],
+            ['loc' => absolute_url('/videolar'), 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => absolute_url('/programlar'), 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => absolute_url('/foto-galeri'), 'changefreq' => 'weekly', 'priority' => '0.6'],
-            ['loc' => absolute_url('/yazarlar'), 'changefreq' => 'weekly', 'priority' => '0.5'],
-            ['loc' => absolute_url('/roportajlar'), 'changefreq' => 'weekly', 'priority' => '0.5'],
-            ['loc' => absolute_url('/arsiv'), 'changefreq' => 'daily', 'priority' => '0.6'],
+            ['loc' => absolute_url('/gundem'), 'changefreq' => 'hourly', 'priority' => '0.8'],
+            ['loc' => absolute_url('/spor'), 'changefreq' => 'hourly', 'priority' => '0.8'],
+            ['loc' => absolute_url('/ekonomi'), 'changefreq' => 'hourly', 'priority' => '0.8'],
+            ['loc' => absolute_url('/kultur-sanat'), 'changefreq' => 'hourly', 'priority' => '0.8'],
+            ['loc' => absolute_url('/teknoloji'), 'changefreq' => 'hourly', 'priority' => '0.8'],
             ['loc' => absolute_url('/iletisim'), 'changefreq' => 'monthly', 'priority' => '0.4'],
             ['loc' => absolute_url('/hakkimizda'), 'changefreq' => 'monthly', 'priority' => '0.4'],
         ];

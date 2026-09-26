@@ -31,6 +31,16 @@ final class NewsController extends BaseController
             ],
         ];
 
+        $mostReadResp = $this->api->get('/news', ['sort' => 'popular', 'per_page' => 5]);
+        $mostRead = [];
+        if (is_array($mostReadResp) && ($mostReadResp['success'] ?? false) === true) {
+            $data = $mostReadResp['data'] ?? [];
+            $mostRead = is_array($data) ? (array_is_list($data) ? $data : (is_array($data['items'] ?? null) ? $data['items'] : [])) : [];
+        }
+        if ($mostRead === []) {
+            $mostRead = is_array($news['related'] ?? null) ? array_slice($news['related'], 0, 5) : [];
+        }
+
         $this->render('pages/news-show', [
             'title' => ($news['title'] ?? 'Haber') . ' | Art World',
             'metaDescription' => truncate((string) ($news['summary'] ?? ''), 160),
@@ -40,6 +50,7 @@ final class NewsController extends BaseController
             'jsonLd' => $jsonLd,
             'news' => $news,
             'related' => is_array($news['related'] ?? null) ? $news['related'] : [],
+            'mostRead' => $mostRead,
             'bodyClass' => 'page-news',
         ]);
     }

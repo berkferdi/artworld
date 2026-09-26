@@ -39,12 +39,20 @@ $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/haber/{slug}', [NewsController::class, 'show']);
 $router->get('/kategori/{slug}', [CategoryController::class, 'show']);
+// Short category URLs (legacy / SEO friendly) — keep /kategori/{slug} too
+$router->get('/gundem', [CategoryController::class, 'show'], ['slug' => 'gundem']);
+$router->get('/spor', [CategoryController::class, 'show'], ['slug' => 'spor']);
+$router->get('/ekonomi', [CategoryController::class, 'show'], ['slug' => 'ekonomi']);
+$router->get('/kultur-sanat', [CategoryController::class, 'show'], ['slug' => 'kultur-sanat']);
+$router->get('/teknoloji', [CategoryController::class, 'show'], ['slug' => 'teknoloji']);
 $router->get('/arama', [SearchController::class, 'index']);
 $router->get('/arsiv', [ArchiveController::class, 'index']);
 
 $router->get('/video', [VideoController::class, 'index']);
+$router->get('/videolar', [VideoController::class, 'index']);
 $router->get('/video/{slug}', [VideoController::class, 'show']);
 $router->get('/canli', [LiveController::class, 'index']);
+$router->get('/canli-yayin', [LiveController::class, 'index']);
 $router->get('/programlar', [ProgramController::class, 'index']);
 $router->get('/program/{slug}', [ProgramController::class, 'show']);
 

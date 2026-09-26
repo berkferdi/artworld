@@ -12,18 +12,8 @@
 /** @var string $siteName */
 /** @var string $siteTagline */
 /** @var string|null $bodyClass */
-$brandLogo = asset('/assets/images/branding/logo-horizontal.svg');
-$apiLogo = (string) ($settings['app_logo'] ?? '');
-// Prefer same-origin branding for header; keep API logo only if absolute https and not a missing demo path pattern handled server-side.
-$logo = $brandLogo;
-if ($apiLogo !== '' && str_starts_with($apiLogo, 'https://') && !str_contains($apiLogo, '/images/demo/logo.png')) {
-    $logo = $apiLogo;
-} elseif ($apiLogo !== '' && str_starts_with($apiLogo, 'https://api.') && str_contains($apiLogo, '/images/')) {
-    // API-hosted media OK over HTTPS
-    $logo = $apiLogo;
-}
-// Always use same-origin branding as default reliable logo
-$logo = $brandLogo;
+// Same-origin dark logo for light header (API logos may be white-on-transparent).
+$logo = asset('/assets/images/branding/logo-horizontal.svg');
 $favicon = asset('/assets/images/branding/favicon.svg');
 $bodyClass = $bodyClass ?? '';
 ?>

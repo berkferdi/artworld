@@ -7,22 +7,43 @@
 /** @var string $logo */
 $liveEnabled = !empty($settings['live_stream_enabled']);
 $bodyClass = $bodyClass ?? '';
-$isHome = str_contains((string) $bodyClass, 'page-home');
-?>
-<?php if (!$isHome): ?>
-<div class="ticker" data-ticker>
-    <div class="ticker__label">PİYASA</div>
-    <div class="ticker__track">
-        <div class="ticker__inner" id="market-ticker">
-            <span>BIST 100 — güncel veri yakında</span>
-            <span>ALTIN — servis entegrasyonu bekleniyor</span>
-            <span>USD/TRY — servis entegrasyonu bekleniyor</span>
-            <span>EUR/TRY — servis entegrasyonu bekleniyor</span>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
+$primaryNav = [
+    ['title' => 'Ana Sayfa', 'url' => url('/')],
+    ['title' => 'Canlı Yayın', 'url' => url('/canli-yayin'), 'live' => true],
+    ['title' => 'Videolar', 'url' => url('/videolar')],
+    ['title' => 'Programlar', 'url' => url('/programlar')],
+    ['title' => 'Foto Galeri', 'url' => url('/foto-galeri')],
+    ['title' => 'İletişim', 'url' => url('/iletisim')],
+];
+
+$categoryNav = [
+    ['title' => 'Gündem', 'url' => url('/gundem'), 'slug' => 'gundem'],
+    ['title' => 'Spor', 'url' => url('/spor'), 'slug' => 'spor'],
+    ['title' => 'Ekonomi', 'url' => url('/ekonomi'), 'slug' => 'ekonomi'],
+    ['title' => 'Kültür Sanat', 'url' => url('/kultur-sanat'), 'slug' => 'kultur-sanat'],
+    ['title' => 'Teknoloji', 'url' => url('/teknoloji'), 'slug' => 'teknoloji'],
+];
+
+// Merge any extra API menu items not already covered
+$known = array_map(static fn($i) => mb_strtolower((string) ($i['title'] ?? '')), array_merge($primaryNav, $categoryNav));
+foreach ($menuItems as $item) {
+    $t = mb_strtolower(trim((string) ($item['title'] ?? '')));
+    if ($t === '' || in_array($t, $known, true)) {
+        continue;
+    }
+    // Skip market ticker leftovers / duplicates
+    if (in_array($t, ['yazarlar', 'röportajlar', 'roportajlar', 'arşiv', 'arsiv'], true)) {
+        continue;
+    }
+    $primaryNav[] = [
+        'title' => (string) $item['title'],
+        'url' => (string) ($item['url'] ?? '#'),
+    ];
+    $known[] = $t;
+}
+?>
 <header class="site-header">
     <div class="shell header-bar">
         <a class="brand" href="<?= e(url('/')) ?>" aria-label="<?= e($siteName) ?>">
@@ -36,7 +57,7 @@ $isHome = str_contains((string) $bodyClass, 'page-home');
 
         <div class="header-actions">
             <?php if ($liveEnabled): ?>
-            <a class="btn btn--live" href="<?= e(url('/canli')) ?>">
+            <a class="btn btn--live" href="<?= e(url('/canli-yayin')) ?>">
                 <span class="live-dot" aria-hidden="true"></span>
                 Canlı Yayın
             </a>
@@ -54,30 +75,24 @@ $isHome = str_contains((string) $bodyClass, 'page-home');
 
     <nav class="primary-nav" id="primary-nav" data-nav>
         <div class="shell nav-row">
-            <?php foreach ($menuItems as $item): ?>
-                <a href="<?= e((string) ($item['url'] ?? '#')) ?>"><?= e((string) ($item['title'] ?? '')) ?></a>
+            <?php foreach ($primaryNav as $item): ?>
+                <?php
+                $url = (string) ($item['url'] ?? '#');
+                $active = ($url !== '/' && str_starts_with($path, rtrim($url, '/'))) || ($url === '/' && $path === '/');
+                $cls = !empty($item['live']) ? 'nav-live' : '';
+                if ($active) {
+                    $cls .= ($cls !== '' ? ' ' : '') . 'is-active';
+                }
+                ?>
+                <a href="<?= e($url) ?>"<?= $cls !== '' ? ' class="' . e($cls) . '"' : '' ?>><?= e((string) ($item['title'] ?? '')) ?></a>
             <?php endforeach; ?>
-            <?php
-            $shown = [];
-            foreach ($menuItems as $mi) {
-                $shown[] = strtolower((string) ($mi['title'] ?? ''));
-            }
-            $navCats = 0;
-            foreach ($categories as $cat) {
-                $name = trim((string) ($cat['name'] ?? ''));
-                if ($name === '' || str_contains($name, '/') || mb_strlen($name) > 28) {
-                    continue;
-                }
-                if (in_array(strtolower($name), $shown, true)) {
-                    continue;
-                }
-                echo '<a class="nav-cat" href="' . e(category_url((string) $cat['slug'])) . '">' . e($name) . '</a>';
-                $navCats++;
-                if ($navCats >= 6) {
-                    break;
-                }
-            }
-            ?>
+            <?php foreach ($categoryNav as $item): ?>
+                <?php
+                $url = (string) $item['url'];
+                $active = str_starts_with($path, $url) || str_contains($path, '/kategori/' . $item['slug']);
+                ?>
+                <a class="nav-cat<?= $active ? ' is-active' : '' ?>" href="<?= e($url) ?>"><?= e((string) $item['title']) ?></a>
+            <?php endforeach; ?>
         </div>
     </nav>
 </header>

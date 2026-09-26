@@ -6,25 +6,29 @@ namespace Web\Core;
 
 final class Router
 {
-    /** @var array<int, array{method:string, pattern:string, handler:callable|array{0:class-string,1:string}}> */
+    /** @var array<int, array{method:string, pattern:string, handler:callable|array{0:class-string,1:string}, defaults:array<string,string>}> */
     private array $routes = [];
 
-    public function get(string $pattern, callable|array $handler): void
+    /** @param array<string, string> $defaults */
+    public function get(string $pattern, callable|array $handler, array $defaults = []): void
     {
-        $this->add('GET', $pattern, $handler);
+        $this->add('GET', $pattern, $handler, $defaults);
     }
 
-    public function post(string $pattern, callable|array $handler): void
+    /** @param array<string, string> $defaults */
+    public function post(string $pattern, callable|array $handler, array $defaults = []): void
     {
-        $this->add('POST', $pattern, $handler);
+        $this->add('POST', $pattern, $handler, $defaults);
     }
 
-    private function add(string $method, string $pattern, callable|array $handler): void
+    /** @param array<string, string> $defaults */
+    private function add(string $method, string $pattern, callable|array $handler, array $defaults = []): void
     {
         $this->routes[] = [
             'method' => strtoupper($method),
             'pattern' => $pattern,
             'handler' => $handler,
+            'defaults' => $defaults,
         ];
     }
 
@@ -46,7 +50,7 @@ final class Router
             if (!preg_match($regex, $path, $matches)) {
                 continue;
             }
-            $params = [];
+            $params = $route['defaults'];
             foreach ($matches as $key => $value) {
                 if (is_string($key)) {
                     $params[$key] = $value;
@@ -56,7 +60,19 @@ final class Router
             if (is_array($handler)) {
                 [$class, $action] = $handler;
                 $controller = new $class();
-                $controller->{$action}(...array_values($params));
+                $ref = new \ReflectionMethod($controller, $action);
+                $args = [];
+                foreach ($ref->getParameters() as $param) {
+                    $name = $param->getName();
+                    if (array_key_exists($name, $params)) {
+                        $args[] = $params[$name];
+                    } elseif ($param->isDefaultValueAvailable()) {
+                        $args[] = $param->getDefaultValue();
+                    } else {
+                        $args[] = null;
+                    }
+                }
+                $controller->{$action}(...$args);
                 return;
             }
             $handler(...array_values($params));
