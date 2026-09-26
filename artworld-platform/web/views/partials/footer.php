@@ -2,12 +2,11 @@
 /** @var array $settings */
 /** @var string $siteName */
 /** @var string $siteTagline */
-$footerLogo = asset('/assets/images/branding/logo-horizontal-light.svg');
 ?>
 <footer class="site-footer">
     <div class="shell footer-grid">
         <div>
-            <img class="footer-logo" src="<?= e($footerLogo) ?>" alt="<?= e($siteName) ?>" width="160" height="48">
+            <div class="footer-brand">ART WORLD <span style="color:#7dd3fc">TV</span></div>
             <p class="footer-tagline"><?= e($siteTagline !== '' ? $siteTagline : 'Dünyanın Buluştuğu Yerdesiniz') ?></p>
             <?php if (!empty($settings['about_text'])): ?>
                 <p class="footer-about"><?= e(truncate((string) $settings['about_text'], 220)) ?></p>

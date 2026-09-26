@@ -47,11 +47,10 @@ foreach ($menuItems as $item) {
 <header class="site-header">
     <div class="shell header-bar">
         <a class="brand" href="<?= e(url('/')) ?>" aria-label="<?= e($siteName) ?>">
+            <span class="brand__mark">ART WORLD</span>
+            <span class="brand__sub">TV</span>
             <?php if ($logo !== ''): ?>
-                <img class="brand__logo" src="<?= e($logo) ?>" alt="<?= e($siteName) ?>" width="160" height="48">
-            <?php else: ?>
-                <span class="brand__mark">ART WORLD</span>
-                <span class="brand__sub">TV</span>
+                <img class="brand__logo brand__logo--sr" src="<?= e($logo) ?>" alt="<?= e($siteName) ?>" width="160" height="48">
             <?php endif; ?>
         </a>
 
