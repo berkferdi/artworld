@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+// Nginx try_files + PHP-FPM: answer HEAD without full render failure
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'HEAD') {
+    http_response_code(200);
+    header('Content-Type: text/html; charset=UTF-8');
+    exit;
+}
+
+
 require_once dirname(__DIR__) . '/config/bootstrap.php';
 
 header('X-Content-Type-Options: nosniff');

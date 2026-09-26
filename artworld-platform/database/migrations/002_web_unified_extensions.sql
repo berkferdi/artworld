@@ -178,32 +178,42 @@ WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'hakkimizda');
 
 INSERT INTO `pages` (`title`, `slug`, `content`, `meta_title`, `meta_description`, `status`, `created_at`, `updated_at`)
 SELECT * FROM (
-  SELECT 'Yayın İlkeleri', 'yayin-ilkeleri', '<p>Yayın ilkelerimiz yakında güncellenecektir.</p>',
-         'Yayın İlkeleri', 'Art World yayın ilkeleri', 'published', UTC_TIMESTAMP(), UTC_TIMESTAMP()
+  SELECT 'Yayın İlkeleri' AS title, 'yayin-ilkeleri' AS slug,
+         '<p>Yayın ilkelerimiz yakında güncellenecektir.</p>' AS content,
+         'Yayın İlkeleri' AS meta_title, 'Art World yayın ilkeleri' AS meta_description,
+         'published' AS status, UTC_TIMESTAMP() AS created_at, UTC_TIMESTAMP() AS updated_at
 ) AS tmp WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'yayin-ilkeleri');
 
 INSERT INTO `pages` (`title`, `slug`, `content`, `meta_title`, `meta_description`, `status`, `created_at`, `updated_at`)
 SELECT * FROM (
-  SELECT 'Kullanım Şartları', 'kullanim-sartlari', '<p>Kullanım şartları yakında güncellenecektir.</p>',
-         'Kullanım Şartları', 'Art World kullanım şartları', 'published', UTC_TIMESTAMP(), UTC_TIMESTAMP()
+  SELECT 'Kullanım Şartları' AS title, 'kullanim-sartlari' AS slug,
+         '<p>Kullanım şartları yakında güncellenecektir.</p>' AS content,
+         'Kullanım Şartları' AS meta_title, 'Art World kullanım şartları' AS meta_description,
+         'published' AS status, UTC_TIMESTAMP() AS created_at, UTC_TIMESTAMP() AS updated_at
 ) AS tmp WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'kullanim-sartlari');
 
 INSERT INTO `pages` (`title`, `slug`, `content`, `meta_title`, `meta_description`, `status`, `created_at`, `updated_at`)
 SELECT * FROM (
-  SELECT 'Gizlilik Politikası', 'gizlilik-politikasi', '<p>Gizlilik politikası yakında güncellenecektir.</p>',
-         'Gizlilik Politikası', 'Art World gizlilik politikası', 'published', UTC_TIMESTAMP(), UTC_TIMESTAMP()
+  SELECT 'Gizlilik Politikası' AS title, 'gizlilik-politikasi' AS slug,
+         '<p>Gizlilik politikası yakında güncellenecektir.</p>' AS content,
+         'Gizlilik Politikası' AS meta_title, 'Art World gizlilik politikası' AS meta_description,
+         'published' AS status, UTC_TIMESTAMP() AS created_at, UTC_TIMESTAMP() AS updated_at
 ) AS tmp WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'gizlilik-politikasi');
 
 INSERT INTO `pages` (`title`, `slug`, `content`, `meta_title`, `meta_description`, `status`, `created_at`, `updated_at`)
 SELECT * FROM (
-  SELECT 'KVKK / Veri Politikası', 'kvkk', '<p>KVKK metni yakında güncellenecektir.</p>',
-         'KVKK', 'Art World KVKK', 'published', UTC_TIMESTAMP(), UTC_TIMESTAMP()
+  SELECT 'KVKK / Veri Politikası' AS title, 'kvkk' AS slug,
+         '<p>KVKK metni yakında güncellenecektir.</p>' AS content,
+         'KVKK' AS meta_title, 'Art World KVKK' AS meta_description,
+         'published' AS status, UTC_TIMESTAMP() AS created_at, UTC_TIMESTAMP() AS updated_at
 ) AS tmp WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'kvkk');
 
 INSERT INTO `pages` (`title`, `slug`, `content`, `meta_title`, `meta_description`, `status`, `created_at`, `updated_at`)
 SELECT * FROM (
-  SELECT 'Künye', 'kunye', '<p>Art World TV künye bilgileri.</p>',
-         'Künye', 'Art World künye', 'published', UTC_TIMESTAMP(), UTC_TIMESTAMP()
+  SELECT 'Künye' AS title, 'kunye' AS slug,
+         '<p>Art World TV künye bilgileri.</p>' AS content,
+         'Künye' AS meta_title, 'Art World künye' AS meta_description,
+         'published' AS status, UTC_TIMESTAMP() AS created_at, UTC_TIMESTAMP() AS updated_at
 ) AS tmp WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'kunye');
 
 INSERT INTO `menus` (`title`, `location`, `sort_order`, `status`, `created_at`, `updated_at`)
