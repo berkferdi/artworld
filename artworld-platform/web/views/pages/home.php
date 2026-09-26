@@ -169,28 +169,6 @@ $renderPickCol = static function (string $title, array $items): void {
 };
 ?>
 
-<?php if ($breakingItems !== []): ?>
-<div class="breaking-ticker" data-breaking-ticker aria-label="Son dakika haberleri">
-    <span class="breaking-ticker__badge">Son Dakika</span>
-    <div class="breaking-ticker__track">
-        <div class="breaking-ticker__inner" data-breaking-inner>
-            <?php foreach ($breakingItems as $b): ?>
-                <?php
-                $href = !empty($b['news_slug'])
-                    ? news_url((string) $b['news_slug'])
-                    : ((string) ($b['target_url'] ?? '#'));
-                $text = (string) ($b['title'] ?? '');
-                if ($text === '') {
-                    continue;
-                }
-                ?>
-                <a href="<?= e($href) ?>"><?= e($text) ?></a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <section class="live-section live-section--top" id="canli-yayin">
     <div class="shell">
         <div class="live-section__head">
@@ -221,6 +199,28 @@ $renderPickCol = static function (string $title, array $items): void {
         <?php endif; ?>
     </div>
 </section>
+
+<?php if ($breakingItems !== []): ?>
+<div class="breaking-ticker" data-breaking-ticker aria-label="Son dakika haberleri">
+    <span class="breaking-ticker__badge">Son Dakika</span>
+    <div class="breaking-ticker__track">
+        <div class="breaking-ticker__inner" data-breaking-inner>
+            <?php foreach ($breakingItems as $b): ?>
+                <?php
+                $href = !empty($b['news_slug'])
+                    ? news_url((string) $b['news_slug'])
+                    : ((string) ($b['target_url'] ?? '#'));
+                $text = (string) ($b['title'] ?? '');
+                if ($text === '') {
+                    continue;
+                }
+                ?>
+                <a href="<?= e($href) ?>"><?= e($text) ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <section class="section section--carousels">
     <div class="shell">
