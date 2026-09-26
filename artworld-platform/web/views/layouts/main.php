@@ -12,7 +12,19 @@
 /** @var string $siteName */
 /** @var string $siteTagline */
 /** @var string|null $bodyClass */
-$logo = (string) ($settings['app_logo'] ?? '');
+$brandLogo = asset('/assets/images/branding/logo-horizontal.svg');
+$apiLogo = (string) ($settings['app_logo'] ?? '');
+// Prefer same-origin branding for header; keep API logo only if absolute https and not a missing demo path pattern handled server-side.
+$logo = $brandLogo;
+if ($apiLogo !== '' && str_starts_with($apiLogo, 'https://') && !str_contains($apiLogo, '/images/demo/logo.png')) {
+    $logo = $apiLogo;
+} elseif ($apiLogo !== '' && str_starts_with($apiLogo, 'https://api.') && str_contains($apiLogo, '/images/')) {
+    // API-hosted media OK over HTTPS
+    $logo = $apiLogo;
+}
+// Always use same-origin branding as default reliable logo
+$logo = $brandLogo;
+$favicon = asset('/assets/images/branding/favicon.svg');
 $bodyClass = $bodyClass ?? '';
 ?>
 <!DOCTYPE html>
@@ -31,7 +43,7 @@ $bodyClass = $bodyClass ?? '';
     <meta property="og:image" content="<?= e($ogImage) ?>">
     <?php endif; ?>
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="icon" href="<?= e($logo !== '' ? $logo : asset('/assets/images/branding/favicon.svg')) ?>">
+    <link rel="icon" href="<?= e($favicon) ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">

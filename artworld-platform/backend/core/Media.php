@@ -13,10 +13,16 @@ final class Media
         }
 
         if (preg_match('#^https?://#i', $path)) {
+            // Force HTTPS for our hosts; never emit http:// media URLs
+            $path = preg_replace('#^http://#i', 'https://', $path) ?? $path;
             return $path;
         }
 
         $base = rtrim((string) Config::get('MEDIA_URL', ''), '/');
+        if ($base === '') {
+            $base = rtrim((string) Config::get('APP_URL', ''), '/');
+        }
+        $base = preg_replace('#^http://#i', 'https://', $base) ?? $base;
         $path = '/' . ltrim($path, '/');
 
         return $base . $path;
